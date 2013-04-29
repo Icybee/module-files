@@ -1,6 +1,6 @@
 {
 	"name": "icybee/module-files",
-	"type": "icybee-module",
+	"type": "icanboogie-module",
 	"description": "Manages the files uploaded by the users of the CMS Icybee.",
 	"keywords": [ "file", "upload" ],
 	"license": "BSD-3-Clause",
@@ -19,9 +19,9 @@
 	"minimum-stability": "dev",
 	"require": {
 		"php": ">=5.3.0",
-		"icybee/module-installer": "*",
-		"icybee/module-nodes": "*",
-		"icanboogie/activerecord": "*"
+		"icanboogie/module-installer": "*",
+		"icanboogie/activerecord": "*",
+		"icybee/module-nodes": "*"
 	},
 	"autoload": {
 		"classmap": [ "lib" ]
