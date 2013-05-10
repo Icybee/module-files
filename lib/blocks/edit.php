@@ -34,8 +34,8 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 	{
 		parent::add_assets($document);
 
-		$document->css->add('../../public/edit.css');
-		$document->js->add('../../public/edit.js');
+		$document->css->add(DIR . 'public/edit.css');
+		$document->js->add(DIR . 'public/edit.js');
 	}
 
 	protected function get_values()

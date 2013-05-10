@@ -83,5 +83,4 @@ class FileUpload extends \Brickrouge\File
 
 		+ parent::alter_dataset($dataset);
 	}
-
 }
