@@ -12,23 +12,12 @@
 namespace Icybee\Modules\Files;
 
 use ICanBoogie\I18n;
+use ICanBoogie\Uploaded;
 
 use Brickrouge\Element;
-use ICanBoogie\Uploaded;
 
 class FileUpload extends \Brickrouge\File
 {
-	public function __construct(array $attributes=array())
-	{
-		parent::__construct
-		(
-			$attributes + array
-			(
-				self::CONSTRUCTOR => 'File'
-			)
-		);
-	}
-
 	protected function infos()
 	{
 		$path = $this['value'];

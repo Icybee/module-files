@@ -4,7 +4,6 @@ return array
 (
 	'fileupload.element' => array
 	(
-		'choose_a_file' => 'Choose a file',
 		'download' => 'Download'
 	),
 
