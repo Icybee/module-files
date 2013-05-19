@@ -1,7 +1,7 @@
 window.addEvent('load', function() {
 
 	var form = $(document.body).getElement('.form-primary.edit')
-	, constructor = form.getElement('[name="#destination"]').value
+	, constructor = form.getElement('[name="' + ICanBoogie.Operation.DESTINATION + '"]').value
 	, emptyControls = []
 
 	form.getElements('input[type=text]').each(function (el) {
