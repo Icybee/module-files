@@ -27,8 +27,6 @@ class UploadOperation extends \ICanBoogie\Operation
 
 	/**
 	 * Controls for the operation: permission(create).
-	 *
-	 * @see ICanBoogie.Operation::get_controls()
 	 */
 	protected function get_controls()
 	{
@@ -115,25 +113,5 @@ EOT;
 
 			return true;
 		}
-
-		#
-		# Damn you Flash !!
-		#
-
-		$core->session;
-
-		$id = uniqid();
-
-		$_SESSION[Module::SESSION_UPLOAD_RESPONSE][$id] = array
-		(
-			'name' => $name,
-			'path' => $path,
-			'fields' => array
-			(
-				'title' => $file->name
-			)
-		);
-
-		return $id;
 	}
 }

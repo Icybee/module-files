@@ -11,6 +11,8 @@
 
 namespace Icybee\Modules\Files;
 
+use Brickrouge\A;
+
 use ICanBoogie\ActiveRecord\Query;
 use ICanBoogie\I18n;
 
@@ -25,7 +27,7 @@ class ManageBlock extends \Icybee\Modules\Nodes\ManageBlock
 		(
 			$module, $attributes + array
 			(
-				self::T_COLUMNS_ORDER => array('title', 'is_online', 'uid', 'mime', 'size', 'modified')
+				self::T_COLUMNS_ORDER => array('title', 'size', 'download', 'is_online', 'uid', 'mime', 'modified')
 			)
 		);
 	}
@@ -34,7 +36,7 @@ class ManageBlock extends \Icybee\Modules\Nodes\ManageBlock
 	{
 		parent::add_assets($document);
 
-		$document->css->add('../../public/manage.css');
+		$document->css->add(DIR . '/public/manage.css');
 	}
 
 	protected function columns()
@@ -49,6 +51,12 @@ class ManageBlock extends \Icybee\Modules\Nodes\ManageBlock
 			File::SIZE => array
 			(
 				'class' => 'size pull-right'
+			),
+
+			'download' => array
+			(
+				'label' => null,
+				'sortable' => false
 			)
 		);
 	}
@@ -138,20 +146,20 @@ class ManageBlock extends \Icybee\Modules\Nodes\ManageBlock
 		return $query;
 	}
 
-	protected function render_cell_title($record, $property)
-	{
-		$rc  = '<a class="download" href="' . \ICanBoogie\escape($record->url('download')) . '"';
-		$rc .= ' title="' . I18n\t('Download the file: :path', array(':path' => $record->path)) . '"';
-		$rc .= '>';
-		$rc .= 'download</a>';
-
-		$rc .= parent::render_cell_title($record, $property);
-
-		return $rc;
-	}
-
 	protected function render_cell_mime($record, $property)
 	{
 		return parent::render_filter_cell($record, $property);
+	}
+
+	protected function render_cell_download(File $record, $property)
+	{
+		return new A
+		(
+			'', $record->url('download'), array
+			(
+				'class' => 'download',
+				'title' => $this->t('Download file')
+			)
+		);
 	}
 }

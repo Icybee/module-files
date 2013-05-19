@@ -31,8 +31,6 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 	 * Unset the `mime` and `size` properties because they cannot be modified by the user. If the
 	 * `file` property is defined, which is the case when an asynchronous upload happend, it is
 	 * copied to the `path` property.
-	 *
-	 * @see Icybee\Modules\Nodes.SaveOperation::get_properties()
 	 */
 	protected function get_properties()
 	{
@@ -82,8 +80,6 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 	 *
 	 * TODO: maybe this is not ideal, since the file upload should be made optionnal when the form
 	 * is generated to edit existing entries.
-	 *
-	 * @see ICanBoogie.Operation::control()
 	 */
 	protected function control(array $controls)
 	{
@@ -122,8 +118,6 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 
 	/**
 	 * The method validates unless there was an error during the file upload.
-	 *
-	 * @see Icybee\Modules\Nodes.SaveOperation::validate()
 	 */
 	protected function validate(\ICanboogie\Errors $errors)
 	{
@@ -136,13 +130,13 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 			return false;
 		}
 
+		return true;
+
 		return parent::validate($errors);
 	}
 
 	/**
 	 * Trigger a {@link File\MoveEvent} when the path of the updated record is modified.
-	 *
-	 * @see Icybee\Modules\Nodes.SaveOperation::process()
 	 */
 	protected function process()
 	{

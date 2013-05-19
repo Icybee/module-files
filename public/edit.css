@@ -4,3 +4,8 @@ form.edit input[type=file]
 	display: block;
 	margin-bottom: .5em;
 }
+
+.widget-file .preview a {
+	color: inherit;
+	font-size: 64px;
+}
