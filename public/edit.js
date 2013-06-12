@@ -1,14 +1,16 @@
 window.addEvent('load', function() {
 
-	var form = $(document.body).getElement('.form-primary.edit')
-	, constructor = form.getElement('[name="' + ICanBoogie.Operation.DESTINATION + '"]').value
-	, emptyControls = []
+	var form = document.body.getElement('.form-primary.edit')
+	, controls = []
+	, controlValue = []
 
-	form.getElements('input[type=text]').each(function (el) {
+	form.getElements('input[type=text]').each(function (control) {
 
-		if (!el.value)
+		controls.push(control)
+
+		if (control.value)
 		{
-			emptyControls.push(el)
+			controlValue[control.uniqueNumber] = true
 		}
 	})
 
@@ -16,20 +18,21 @@ window.addEvent('load', function() {
 
 		var widget = el.get('widget')
 
-		widget.options.uploadUrl = '/api/' + constructor + '/upload'
-
 		widget.addEvent('change', function(response) {
 
 			Object.each(response.properties, function(value, key) {
 
-				var input = document.id(form.elements[key])
+				var control = document.id(form.elements[key])
 
-				if (!input || emptyControls.indexOf(input) == -1)
+				if (!control) return
+
+				if (control.value && (controls.indexOf(control) == -1 || (controlValue[control.uniqueNumber] && controlValue[control.uniqueNumber] != control.value)))
 				{
 					return
 				}
 
-				input.value = value
+				controlValue[control.uniqueNumber] = value
+				control.value = value
 			})
 		})
 	})

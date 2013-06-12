@@ -1,8 +1,5 @@
-form.edit input.file-reminder,
-form.edit input[type=file]
-{
-	display: block;
-	margin-bottom: .5em;
+.widget-file .reminder {
+	display: none;
 }
 
 .widget-file .preview a {
