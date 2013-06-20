@@ -19,8 +19,8 @@ return array
 			(
 				'fields' => array
 				(
-					'path' => 'varchar',
-					'mime' => 'varchar',
+					'hash' => array('char', 48, 'charset' => 'ascii_bin', 'indexed' => true),
+					'mime' => array('varchar', 'charset' => 'ascii_general_ci'),
 					'size' => array('integer', 'unsigned' => true),
 					'description' => 'text'
 				)

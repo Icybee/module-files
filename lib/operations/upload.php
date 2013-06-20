@@ -11,17 +11,22 @@
 
 namespace Icybee\Modules\Files;
 
+use ICanBoogie\HTTP\Request;
 use ICanBoogie\Uploaded;
 
 class UploadOperation extends \ICanBoogie\Operation
 {
 	/**
-	 * @var Uploaded The target file of the operation.
+	 * The target file of the operation.
+	 *
+	 * @var Uploaded
 	 */
 	protected $file;
 
 	/**
-	 * @var array Accepted file types.
+	 * Accepted file types.
+	 *
+	 * @var array
 	 */
 	protected $accept;
 
@@ -38,17 +43,15 @@ class UploadOperation extends \ICanBoogie\Operation
 		+ parent::get_controls();
 	}
 
-	public function reset()
+	public function __invoke(Request $request)
 	{
-		parent::reset();
-
 		$this->module->clean_repository();
+
+		return parent::__invoke($request);
 	}
 
 	/**
 	 * Validates the operation if the file upload succeeded.
-	 *
-	 * @see ICanBoogie.Operation::validate()
 	 */
 	protected function validate(\ICanboogie\Errors $errors)
 	{
@@ -78,19 +81,16 @@ class UploadOperation extends \ICanBoogie\Operation
 		return true;
 	}
 
-	/**
-	 * @see ICanBoogie.Operation::process()
-	 */
 	protected function process()
 	{
 		global $core;
 
 		$file = $this->file;
-		$path = $core->config['repository.temp'] . '/' . basename($file->location) . $file->extension;
+		$filename = basename($file->location) . $file->extension;
+		$path = $core->config['repository.temp'] . '/' . $filename;
 
 		$file->move(\ICanBoogie\DOCUMENT_ROOT . $path, true);
 
-		$file->location = $path;
 		$name = $file->name;
 
 		$this->response['infos'] = null;
@@ -99,11 +99,9 @@ class UploadOperation extends \ICanBoogie\Operation
 			'title' => $name
 		);
 
-		if (isset($_SERVER['HTTP_X_USING_FILE_API']))
-		{
-			$size = \ICanBoogie\I18n\format_size($file->size);
+		$size = \ICanBoogie\I18n\format_size($file->size);
 
-			$this->response['infos'] = <<<EOT
+		$this->response['infos'] = <<<EOT
 <ul class="details">
 	<li><span title="Path: {$file->location}">{$name}</span></li>
 	<li>$file->mime</li>
@@ -111,7 +109,6 @@ class UploadOperation extends \ICanBoogie\Operation
 </ul>
 EOT;
 
-			return true;
-		}
+		return $filename;
 	}
 }

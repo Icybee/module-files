@@ -15,9 +15,49 @@ use ICanBoogie\I18n;
 use ICanBoogie\Uploaded;
 
 use Brickrouge\Element;
+use Brickrouge\A;
 
 class FileUpload extends \Brickrouge\File
 {
+	protected $record;
+
+	/**
+	 * If the `value` attribute is set to a {@link File} record, its value is set to
+	 * {@link $record} then it is changed to the image server path.
+	 */
+	public function offsetSet($attribute, $value)
+	{
+		if ($attribute == 'value')
+		{
+			if ($value instanceof File)
+			{
+				$this->record = $value;
+
+				$value = $value->server_path;
+			}
+			else
+			{
+				$this->record = null;
+			}
+		}
+
+		parent::offsetSet($attribute, $value);
+	}
+
+	/**
+	 * If the value was a {@link File} record, the value is changed to the hash of the record's
+	 * file.
+	 */
+	protected function render_reminder($name, $value)
+	{
+		if ($this->record)
+		{
+			$value = $this->record->hash;
+		}
+
+		return parent::render_reminder($name, $value);
+	}
+
 	protected function infos()
 	{
 		$path = $this['value'];
@@ -50,9 +90,14 @@ class FileUpload extends \Brickrouge\File
 
 	protected function preview($path)
 	{
-		$rc = '<a class="icon-download-alt" href="' . $path . '" title="' . I18n\t('download', array(), array('scope' => array('fileupload', 'element'))) . '"></a>';
-
-		return $rc;
+		return new A
+		(
+			'', \ICanBoogie\strip_root($path), array
+			(
+				'class' => 'icon-download-alt',
+				'title' => I18n\t('download', array(), array('scope' => 'fileupload.element'))
+			)
+		);
 	}
 
 	protected function alter_dataset(array $dataset)

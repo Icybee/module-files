@@ -17,9 +17,6 @@ use ICanBoogie\Uploaded;
 class Module extends \Icybee\Modules\Nodes\Module
 {
 	const OPERATION_UPLOAD = 'upload';
-	const OPERATION_UPLOAD_RESPONSE = 'uploadResponse';
-
-	const SESSION_UPLOAD_RESPONSE = 'resources.files.upload.responses';
 
 	static protected $repository = array();
 
@@ -36,11 +33,48 @@ class Module extends \Icybee\Modules\Nodes\Module
 	}
 
 	/**
+	 * Removes unused files.
+	 */
+	static public function removed_unused_files()
+	{
+		global $core;
+
+		$hashes = $core->models['files']->select('hash, hash')->pairs;
+		$di = new \DirectoryIterator(\ICanBoogie\REPOSITORY . 'files' . DIRECTORY_SEPARATOR);
+
+		foreach ($di as $file)
+		{
+			if (!$file->isFile())
+			{
+				continue;
+			}
+
+			$filename = $file->getFilename();
+
+			if ($filename{0} == '.')
+			{
+				continue;
+			}
+
+			$hash = pathinfo($filename, PATHINFO_FILENAME);
+
+			if (isset($hashes[$hash]))
+			{
+				continue;
+			}
+
+			$pathname = $file->getPathname();
+
+			\ICanBoogie\log("Unused file removed: %file.", array('file' => $filename));
+
+			unlink($pathname);
+		}
+	}
+
+	/**
 	 * Overrides the method to create the "/repository/tmp/" and "/repository/files/" directories,
 	 * and add a ".htaccess" file in the "/repository/tmp/" direcotry which denies all access and
 	 * a ".htaccess" file in the "/repository/files/" directory which allows all access.
-	 *
-	 * @see ICanBoogie.Module::install()
 	 */
 	public function install(\ICanBoogie\Errors $errors)
 	{
@@ -71,7 +105,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 		}
 		else
 		{
-			$errors[$this->id] = new FormattedString('The %var var is empty is core config', array('%var' => 'repository.temp'));
+			$errors[$this->id] = new FormattedString('The %var var is empty in core config', array('%var' => 'repository.temp'));
 		}
 
 		$path = $core->config['repository.files'];

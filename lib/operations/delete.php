@@ -11,6 +11,13 @@
 
 namespace Icybee\Modules\Files;
 
+/**
+ * Deletes a file.
+ *
+ * Because a same file may actually be used by multiple records, the operation actually only
+ * deletes the record. The module attaches an event hook to the `process` event of the operation
+ * to remove unused files.
+ */
 class DeleteOperation extends \Icybee\Modules\Nodes\DeleteOperation
 {
 

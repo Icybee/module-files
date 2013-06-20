@@ -147,13 +147,16 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 					(
 						Form::LABEL => 'file',
 						Element::REQUIRED => empty($entry_nid),
-						\Brickrouge\File::FILE_WITH_LIMIT => $core->site->metas[$this->module->flat_id . '.max_file_size'],
-						Element::WEIGHT => -100,
-						\Brickrouge\File::T_UPLOAD_URL => Operation::encode($this->module->id . '/upload')
+						Element::WEIGHT => 'title:before',
+
+						\Brickrouge\File::FILE_WITH_LIMIT => $core->site->metas[$this->module->flat_id . '.max_file_size'] ?: true,
+						\Brickrouge\File::T_UPLOAD_URL => Operation::encode($this->module->id . '/upload'),
+
+						'value' => $this->record
 					)
 				),
 
-				File::DESCRIPTION => new RTEEditorElement
+				File::DESCRIPTION => $core->editors['rte']->from
 				(
 					array
 					(

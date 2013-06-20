@@ -11,8 +11,6 @@
 
 namespace Icybee\Modules\Files;
 
-use ICanBoogie\HTTP\HTTPError;
-
 /**
  * Downloads a file.
  *
@@ -20,102 +18,24 @@ use ICanBoogie\HTTP\HTTPError;
  *
  * Offline files cannot be downloaded by visitors.
  */
-class DownloadOperation extends \ICanBoogie\Operation
+class DownloadOperation extends GetOperation
 {
-	/**
-	 * Controls for the operation: record.
-	 *
-	 * @see ICanBoogie.Operation::get_controls()
-	 */
-	protected function get_controls()
-	{
-		return array
-		(
-			self::CONTROL_RECORD => true
-		)
-
-		+ parent::get_controls();
-	}
-
-	/**
-	 * Overrides the method to check the availability of the record to the requesting user.
-	 *
-	 * @see ICanBoogie.Operation::control_record()
-	 * @throws HTTPException with HTTP code 401, if the user is a guest and the record is
-	 * offline.
-	 */
-	protected function control_record()
-	{
-		global $core;
-
-		$record = parent::control_record();
-
-		if ($core->user->is_guest && !$record->is_online)
-		{
-			throw new HTTPError
-			(
-				\ICanBoogie\format('The requested resource requires authentication: %resource', array
-				(
-					'%resource' => $record->constructor . '/' . $this->key
-				)),
-
-				401
-			);
-		}
-
-		return $record;
-	}
-
-	protected function validate(\ICanboogie\Errors $errors)
-	{
-		return true;
-	}
-
 	protected function process()
 	{
-		$record = $this->record;
-		$request = $this->request;
+		$rc = parent::process();
+
 		$response = $this->response;
 
-		// TODO-20090512: Implement Accept-Range
-
-		$filename = $record->title . $record->extension;
-		$filename = strtr($filename, '"', '');
-
-		$response->headers['Content-Description'] = 'File Transfer';
-		$response->headers['Content-Disposition'] = array('attachment', $filename);
-		$response->headers['Content-Type'] = $record->mime;
-		$response->headers['Content-Transfer-Encodin'] = 'binary';
-		$response->headers['Content-Length'] = $record->size;
-
-		return function() use ($record)
+		if ($response->status == 304)
 		{
-			$fh = fopen(\ICanBoogie\DOCUMENT_ROOT . $record->path, 'rb');
+			return $rc;
+		}
 
-			if ($fh)
-		    {
-				#
-				# Reset time limit for big files
-				#
+		$record = $this->record;
+		$response->headers['Content-Description'] = 'File Transfer';
+		$response->headers['Content-Disposition'] = array('attachment', $record->title . $record->extension);
+		$response->headers['Content-Transfer-Encoding'] = 'binary';
 
-		    	if (!ini_get('safe_mode'))
-		    	{
-					set_time_limit(0);
-		    	}
-
-				while (!feof($fh) && !connection_status())
-				{
-					echo fread($fh, 1024 * 8);
-
-					#
-					# flushing frees memory used by the PHP buffer
-					#
-
-					flush();
-				}
-
-				fclose($fh);
-			}
-		};
+		return $rc;
 	}
 }

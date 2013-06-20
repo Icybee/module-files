@@ -12,61 +12,163 @@
 namespace Icybee\Modules\Files;
 
 use ICanBoogie\I18n\FormattedString;
-
+use ICanBoogie\HTTP\Request;
 use ICanBoogie\Uploaded;
+use ICanBoogie\HTTP\Response;
 
+/**
+ * Saves a file.
+ *
+ * @property-read array $accepted_mime The accepted MIME types.
+ */
 class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 {
 	/**
-	 * @var Uploaded|bool The optional file to save with the record.
+	 * Hash of the updated file.
+	 *
+	 * @var string
 	 */
-	protected $file;
+	protected $file_hash;
 
 	/**
-	 * @var array Accepted file types.
+	 * MIME type of the uploaded file.
+	 *
+	 * @var string
 	 */
-	protected $accept;
+	protected $file_mime;
 
 	/**
-	 * Unset the `mime` and `size` properties because they cannot be modified by the user. If the
-	 * `file` property is defined, which is the case when an asynchronous upload happend, it is
-	 * copied to the `path` property.
+	 * Absolute path to the updated file.
+	 *
+	 * @var string
+	 */
+	protected $file_path;
+
+	/**
+	 * Path of the temporary file.
+	 *
+	 * @var string
+	 */
+	protected $tmp_file_path;
+
+	/**
+	 * Returns the accepted MIME types.
+	 *
+	 * @return array
+	 */
+	protected function volatile_get_accepted_mime()
+	{
+		return array();
+	}
+
+	/**
+	 * Sets {@link File::HASH} to the {@link $file_hash} property, or unset it if the property is
+	 * empty. Sets {@link File::SIZE} and {@link File::MIME} according to the {@link $file_path}
+	 * property, or unset them if the property is empty.
 	 */
 	protected function get_properties()
 	{
 		$properties = parent::get_properties();
 
-		unset($properties[File::MIME]);
-		unset($properties[File::SIZE]);
+		$hash = $this->file_hash;
 
-		#
-		# TODO-20100624: Using the 'file' property might be the way to go
-		#
-
-		if (isset($properties['file']))
+		if ($hash)
 		{
-			$properties[File::PATH] = $properties['file'];
+			$properties[File::HASH] = $hash;
+		}
+		else
+		{
+			unset($properties[File::HASH]);
 		}
 
-		#
-		# File:PATH is set to true when the file is not mandatory and there is no uploaded file in
-		# order fot the form still validates, in which case the property must be unset, otherwise
-		# the boolean is used a the new path.
-		#
+		$path = $this->file_path;
 
-		if (isset($properties[File::PATH]) && $properties[File::PATH] === true)
+		if ($path)
 		{
-			unset($properties[File::PATH]);
+			$properties[File::SIZE] = filesize($path);
+		}
+		else
+		{
+			unset($properties[File::SIZE]);
+		}
+
+		$mime = $this->file_mime;
+
+		if ($mime)
+		{
+			$properties[File::MIME] = $mime;
+		}
+		else
+		{
+			unset($properties[File::MIME]);
 		}
 
 		return $properties;
 	}
 
-	public function reset()
+	/**
+	 * The repository is cleaned before the method is passed to the parent class.
+	 */
+	public function __invoke(Request $request)
 	{
-		parent::reset();
-
 		$this->module->clean_repository();
+
+		try
+		{
+			$response = parent::__invoke($request);
+		}
+		catch (\Exception $e)
+		{
+			#
+			# Because the operation failed, the file that was created is removed.
+			#
+
+			$file_path = $this->file_path;
+
+			if ($file_path && file_exists($file_path))
+			{
+				unlink($file_path);
+			}
+
+			throw $e;
+		}
+
+		#
+		# If the response is successful the temporary file can be removed.
+		#
+
+		$tmp_file_name = $this->tmp_file_path;
+
+		if ($tmp_file_name && $response instanceof Response && $response->is_ok)
+		{
+			unlink($tmp_file_name);
+		}
+
+		#
+		# If the response is not successful the managed file is removed.
+		#
+
+		$file_path = $this->file_path;
+
+		if ($file_path && (!($response instanceof Response) || !$response->is_ok))
+		{
+			unlink($file_path);
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Invokes the {@link control_file} method before anything, to check if a file was uploaded.
+	 */
+	protected function control(array $controls)
+	{
+		if (!$this->control_file())
+		{
+			return;
+		}
+
+		return parent::control($controls);
 	}
 
 	/**
@@ -81,58 +183,87 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 	 * TODO: maybe this is not ideal, since the file upload should be made optionnal when the form
 	 * is generated to edit existing entries.
 	 */
-	protected function control(array $controls)
+	protected function control_file()
 	{
-		global $core;
+		$file_hash = null;
+		$file_mime = null;
+		$file_path = null;
 
-		$this->file = null;
 		$request = $this->request;
+		$tmp_filename = $request[File::PATH];
 
-		if (empty($request[File::PATH]))
+		if ($tmp_filename)
 		{
-			$required = empty($this->key);
-			$file = new Uploaded(File::PATH, $this->accept, $required);
+			#
+			# PATH equals HASH when saving a record with an unchanged file.
+			#
 
-			$this->file = $file;
+			if ($this->record && $this->record->hash == $tmp_filename)
+			{
+				return true;
+			}
+
+			$tmp_file_path = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . basename($tmp_filename);
+			$this->tmp_file_path = $tmp_file_path;
+
+			if (!file_exists($tmp_file_path))
+			{
+				$this->response->errors[File::PATH] = new FormattedString("Missing temporary file: %name.", array('name' => $tmp_filename));
+
+				return false;
+			}
+
+			$file_hash = File::create_hash($tmp_file_path);
+			$file_extension = pathinfo($tmp_file_path, PATHINFO_EXTENSION);
+			$file_name = $file_hash . ($file_extension ? '.' . $file_extension : '');
+			$file_path = \ICanBoogie\REPOSITORY . 'files' . DIRECTORY_SEPARATOR . $file_name;
+			$file_mime = Uploaded::getMIME($file_path);
+
+			if (!file_exists($file_path))
+			{
+				copy($tmp_file_path, $file_path);
+			}
+		}
+		else // file upload
+		{
+			$file = new Uploaded(File::PATH, $this->accepted_mime);
 
 			if ($file->location)
 			{
-				$path = $core->config['repository.temp'] . '/' . basename($file->location) . $file->extension;
-				$file->move($_SERVER['DOCUMENT_ROOT'] . $path, true);
+				$file_hash = File::create_hash($file->location);
+				$file_extension = $file->extension;
+				$file_name = $file_hash . $file_extension;
+				$file_path = \ICanBoogie\REPOSITORY . 'files' . DIRECTORY_SEPARATOR . $file_name;
+				$file_mime = $file->mime;
 
-				$request[File::PATH] = $path;
+				if (!file_exists($file_path))
+				{
+					$file->move($file_path);
+				}
 
-				if (empty($request[File::TITLE]))
+				if (!$request[File::TITLE])
 				{
 					$request[File::TITLE] = $file->name;
 				}
 			}
-			else if (!$required)
+			else
 			{
-				$request[File::PATH] = true;
+				$this->errors[File::PATH] = new FormattedString('Unable to upload file %file: :message.', array('%file' => $file->name, ':message' => $file->er_message));
+
+				return false;
 			}
 		}
 
-		return parent::control($controls);
-	}
+		$this->file_hash = $file_hash;
+		$this->file_mime = $file_mime;
+		$this->file_path = $file_path;
 
-	/**
-	 * The method validates unless there was an error during the file upload.
-	 */
-	protected function validate(\ICanboogie\Errors $errors)
-	{
-		$file = $this->file;
-
-		if ($file && $file->er)
+		if ($this->key)
 		{
-			$errors[File::PATH] = new FormattedString('Unable to upload file %file: :message.', array('%file' => $file->name, ':message' => $file->er_message));
-
-			return false;
+			return !!$file_hash;
 		}
 
 		return true;
-
-		return parent::validate($errors);
 	}
 
 	/**
@@ -140,22 +271,11 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 	 */
 	protected function process()
 	{
-		$record = $this->record;
-		$oldpath = $record ? $record->path : null;
-
-		$rc = parent::process();
-
-		if ($oldpath)
-		{
-			$newpath = $this->module->model->select('path')->filter_by_nid($rc['key'])->rc;
-
-			if ($oldpath != $newpath)
-			{
-				new File\MoveEvent($record, $oldpath, $newpath);
-			}
-		}
-
-		return $rc;
+		return parent::process() + array
+		(
+			'hash' => $this->record->hash,
+			'path' => $this->record->url('get')
+		);
 	}
 }
 
