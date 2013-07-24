@@ -1,22 +1,19 @@
-@charset "utf-8";
-
-#manager td.cell--size {
+.cell--size {
 	width: 10ex;
 }
 
-#manager td.cell--download {
+.cell--download {
 	width: 20px;
 	text-align: center;
 }
 
-#manager a.download {
+.cell--download a {
 	font-size: 16px;
 	vertical-align: middle;
-	text-decoration: none;
+	text-decoration: none !important;
 }
 
-#manager a.download:before
-{
+.cell--download a:before {
 	font-family: FontAwesome;
 	content: "\f019";
 }

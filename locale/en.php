@@ -2,6 +2,28 @@
 
 return array
 (
+	'files' => array
+	(
+		'count' => array
+		(
+			'none' => 'No files',
+			'one' => 'One file',
+			'other' => ':count files'
+		),
+
+		'name' => array
+		(
+			'one' => 'File',
+			'other' => 'Files'
+		),
+
+		'manage.column' => array
+		(
+			'mime' => 'MIME type',
+			'size' => 'Size'
+		)
+	),
+
 	'fileupload.element' => array
 	(
 		'download' => 'Download'
@@ -12,12 +34,6 @@ return array
 		'description' => 'Description',
 		'file' => 'File',
 		'max_file_size' => 'Maximum size of uploaded files'
-	),
-
-	'manage.label' => array
-	(
-		'mime' => 'MIME type',
-		'size' => 'Size'
 	),
 
 	'module_category.resources' => 'Resources',

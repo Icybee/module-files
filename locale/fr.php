@@ -15,6 +15,12 @@ return array
 		(
 			'one' => 'Fichier',
 			'other' => 'Fichiers'
+		),
+
+		'manage.column' => array
+		(
+			'mime' => 'Type MIME',
+			'size' => 'Taille'
 		)
 	),
 
@@ -27,12 +33,6 @@ return array
 	(
 		'file' => 'Fichier',
 		'max_file_size' => 'Taille maximale des fichiers déposés'
-	),
-
-	'manager.label' => array
-	(
-		'mime' => 'Type MIME',
-		'size' => 'Taille'
 	),
 
 	'module_category.resources' => 'Ressources',
