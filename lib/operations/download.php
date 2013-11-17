@@ -24,8 +24,6 @@ class DownloadOperation extends \ICanBoogie\Operation
 {
 	/**
 	 * Controls for the operation: record.
-	 *
-	 * @see ICanBoogie.Operation::get_controls()
 	 */
 	protected function get_controls()
 	{
@@ -40,7 +38,6 @@ class DownloadOperation extends \ICanBoogie\Operation
 	/**
 	 * Overrides the method to check the availability of the record to the requesting user.
 	 *
-	 * @see ICanBoogie.Operation::control_record()
 	 * @throws HTTPException with HTTP code 401, if the user is a guest and the record is
 	 * offline.
 	 */
@@ -83,7 +80,8 @@ class DownloadOperation extends \ICanBoogie\Operation
 		$filename = strtr($filename, '"', '');
 
 		$response->headers['Content-Description'] = 'File Transfer';
-		$response->headers['Content-Disposition'] = array('attachment', $filename);
+		$response->headers['Content-Disposition']->value = 'attachment';
+		$response->headers['Content-Disposition']->filename = $filename;
 		$response->headers['Content-Type'] = $record->mime;
 		$response->headers['Content-Transfer-Encodin'] = 'binary';
 		$response->headers['Content-Length'] = $record->size;
@@ -92,30 +90,32 @@ class DownloadOperation extends \ICanBoogie\Operation
 		{
 			$fh = fopen(\ICanBoogie\DOCUMENT_ROOT . $record->path, 'rb');
 
-			if ($fh)
-		    {
-				#
-				# Reset time limit for big files
-				#
-
-		    	if (!ini_get('safe_mode'))
-		    	{
-					set_time_limit(0);
-		    	}
-
-				while (!feof($fh) && !connection_status())
-				{
-					echo fread($fh, 1024 * 8);
-
-					#
-					# flushing frees memory used by the PHP buffer
-					#
-
-					flush();
-				}
-
-				fclose($fh);
+			if (!$fh)
+			{
+				throw new HTTPError("Unable to lock file");
 			}
+
+			#
+			# Reset time limit for big files
+			#
+
+			if (!ini_get('safe_mode'))
+			{
+				set_time_limit(0);
+			}
+
+			while (!feof($fh) && !connection_aborted())
+			{
+				echo fread($fh, 1024 * 8);
+
+				#
+				# flushing frees memory used by the PHP buffer
+				#
+
+				flush();
+			}
+
+			fclose($fh);
 		};
 	}
 }
