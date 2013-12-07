@@ -66,7 +66,7 @@ class File extends \Icybee\Modules\Nodes\Node
 	 *
 	 * @return string
 	 */
-	protected function volatile_get_extension()
+	protected function get_extension()
 	{
 		return '.' . pathinfo($this->path, PATHINFO_EXTENSION);
 	}

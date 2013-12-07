@@ -32,9 +32,9 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 	 * `file` property is defined, which is the case when an asynchronous upload happend, it is
 	 * copied to the `path` property.
 	 */
-	protected function get_properties()
+	protected function lazy_get_properties()
 	{
-		$properties = parent::get_properties();
+		$properties = parent::lazy_get_properties();
 
 		unset($properties[File::MIME]);
 		unset($properties[File::SIZE]);

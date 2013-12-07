@@ -38,9 +38,9 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 		$document->js->add(DIR . 'public/edit.js');
 	}
 
-	protected function get_values()
+	protected function lazy_get_values()
 	{
-		return parent::get_values() + array
+		return parent::lazy_get_values() + array
 		(
 			File::NID => null,
 			File::PATH => null,
@@ -48,7 +48,7 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 		);
 	}
 
-	protected function get_children()
+	protected function lazy_get_children()
 	{
 		global $core;
 
@@ -139,7 +139,7 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 
 		return array_merge
 		(
-			parent::get_children(), array
+			parent::lazy_get_children(), array
 			(
 				File::PATH => new $uploader_class
 				(
