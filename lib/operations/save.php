@@ -28,7 +28,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 	protected $accept;
 
 	/**
-	 * Unset the `mime` and `size` properties because they cannot be modified by the user. If the
+	 * Unset the `mime` and `size` properties because they cannot be updated by the user. If the
 	 * `file` property is defined, which is the case when an asynchronous upload happend, it is
 	 * copied to the `path` property.
 	 */
@@ -136,7 +136,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 	}
 
 	/**
-	 * Trigger a {@link File\MoveEvent} when the path of the updated record is modified.
+	 * Trigger a {@link File\MoveEvent} when the path of the updated record is updated.
 	 */
 	protected function process()
 	{
