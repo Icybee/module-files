@@ -68,33 +68,29 @@ class DownloadOperation extends \ICanBoogie\Operation
 		return true;
 	}
 
+	// TODO-20090512: Implement Accept-Range
 	protected function process()
 	{
 		$record = $this->record;
-		$request = $this->request;
-		$response = $this->response;
-
-		// TODO-20090512: Implement Accept-Range
-
 		$filename = $record->title . $record->extension;
-		$filename = strtr($filename, '"', '');
 
+		$response = $this->response;
 		$response->headers['Content-Description'] = 'File Transfer';
-		$response->headers['Content-Disposition']->value = 'attachment';
+		$response->headers['Content-Disposition']->type = 'attachment';
 		$response->headers['Content-Disposition']->filename = $filename;
 		$response->headers['Content-Type'] = $record->mime;
 		$response->headers['Content-Transfer-Encodin'] = 'binary';
 		$response->headers['Content-Length'] = $record->size;
 
-		return function() use ($record)
+		$fh = fopen(\ICanBoogie\DOCUMENT_ROOT . $record->path, 'rb');
+
+		if (!$fh)
 		{
-			$fh = fopen(\ICanBoogie\DOCUMENT_ROOT . $record->path, 'rb');
+			throw new HTTPError("Unable to lock file.");
+		}
 
-			if (!$fh)
-			{
-				throw new HTTPError("Unable to lock file");
-			}
-
+		return function() use ($fh)
+		{
 			#
 			# Reset time limit for big files
 			#

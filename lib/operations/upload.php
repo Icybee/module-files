@@ -42,7 +42,7 @@ class UploadOperation extends \ICanBoogie\Operation
 	{
 		parent::reset();
 
-		$this->module->clean_repository();
+		$this->module->clean_temporary_files();
 	}
 
 	/**
@@ -86,11 +86,11 @@ class UploadOperation extends \ICanBoogie\Operation
 		global $core;
 
 		$file = $this->file;
-		$path = $core->config['repository.temp'] . '/' . basename($file->location) . $file->extension;
+		$path = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . basename($file->location) . $file->extension;
 
-		$file->move(\ICanBoogie\DOCUMENT_ROOT . $path, true);
+		$file->move($path, true);
 
-		$file->location = $path;
+		$file->location = \ICanBoogie\strip_root($path);
 		$name = $file->name;
 
 		$this->response['infos'] = null;

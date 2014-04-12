@@ -112,7 +112,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 		return parent::is_installed($errors);
 	}
 
-	public function clean_repository($lifetime=3600)
+	public function clean_temporary_files($lifetime=3600)
 	{
 		$path = \ICanBoogie\REPOSITORY . 'tmp';
 

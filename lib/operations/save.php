@@ -11,6 +11,7 @@
 
 namespace Icybee\Modules\Files;
 
+use ICanBoogie\HTTP\Request;
 use ICanBoogie\Uploaded;
 
 class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
@@ -60,11 +61,14 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 		return $properties;
 	}
 
-	public function reset()
+	/**
+	 * The temporary files stored in the repository are cleaned before the operation is processed.
+	 */
+	public function __invoke(Request $request)
 	{
-		parent::reset();
+		$this->module->clean_temporary_files();
 
-		$this->module->clean_repository();
+		return parent::__invoke($request);
 	}
 
 	/**
@@ -95,10 +99,10 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 
 			if ($file->location)
 			{
-				$path = $core->config['repository.temp'] . '/' . basename($file->location) . $file->extension;
-				$file->move($_SERVER['DOCUMENT_ROOT'] . $path, true);
+				$path = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . basename($file->location) . $file->extension;
+				$file->move($path, true);
 
-				$request[File::PATH] = $path;
+				$request[File::PATH] = \ICanBoogie\strip_root($path);
 
 				if (empty($request[File::TITLE]))
 				{
@@ -148,7 +152,10 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 
 		if ($oldpath)
 		{
-			$newpath = $this->module->model->select('path')->filter_by_nid($rc['key'])->rc;
+			$newpath = $this->module->model
+			->select('path')
+			->filter_by_nid($rc['key'])
+			->rc;
 
 			if ($oldpath != $newpath)
 			{
@@ -190,6 +197,9 @@ class MoveEvent extends \ICanBoogie\Event
 	 */
 	public function __construct(\Icybee\Modules\Files\File $target, $from, $to)
 	{
-		parent::__construct($target, 'move', array('from' => $from, 'to' => $to));
+		$this->from = $from;
+		$this->to = $to;
+
+		parent::__construct($target, 'move');
 	}
 }
