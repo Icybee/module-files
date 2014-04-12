@@ -11,7 +11,6 @@
 
 namespace Icybee\Modules\Files;
 
-use ICanBoogie\I18n\FormattedString;
 use ICanBoogie\Uploaded;
 
 class Module extends \Icybee\Modules\Nodes\Module
@@ -50,7 +49,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 			}
 			else
 			{
-				$errors[$this->id] = new FormattedString('Unable to create %directory directory, its parent is not writtable.', [ '%directory' => $path ]);
+				$errors[$this->id] = $errors->format('Unable to create %directory directory, its parent is not writtable.', [ '%directory' => $path ]);
 			}
 		}
 
@@ -72,7 +71,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 			}
 			else
 			{
-				$errors[$this->id] = new FormattedString('Unable to create %directory directory, its parent is not writtable', [ '%directory' => $path ]);
+				$errors[$this->id] = $errors->format('Unable to create %directory directory, its parent is not writtable', [ '%directory' => $path ]);
 			}
 		}
 
@@ -96,7 +95,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 
 		if (!is_dir($path))
 		{
-			$errors[$this->id] = new FormattedString('The %directory directory is missing.', [ '%directory' => $path ]);
+			$errors[$this->id] = $errors->format('The %directory directory is missing.', [ '%directory' => $path ]);
 		}
 
 		#
@@ -107,7 +106,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 
 		if (!is_dir($path))
 		{
-			$errors[$this->id] = new FormattedString('The %directory directory is missing.', [ '%directory' => $path ]);
+			$errors[$this->id] = $errors->format('The %directory directory is missing.', [ '%directory' => $path ]);
 		}
 
 		return parent::is_installed($errors);
