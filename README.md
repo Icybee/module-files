@@ -1,4 +1,4 @@
-# Files [![Build Status](https://travis-ci.org/Icybee/module-files.png?branch=master)](https://travis-ci.org/Icybee/module-files)
+# Files [![Build Status](https://travis-ci.org/Icybee/module-files.png?branch=2.0)](https://travis-ci.org/Icybee/module-files)
 
 The module "Files" (`files`) manages the files uploaded by the users of the
 CMS [Icybee](http://icybee.org/).
@@ -7,9 +7,15 @@ CMS [Icybee](http://icybee.org/).
 
 
 
+----------
+
+
+
+
+
 ## Requirement
 
-The package requires PHP 5.3 or later.
+The package requires PHP 5.4 or later.
 
 
 
@@ -25,7 +31,7 @@ Create a `composer.json` file and run `php composer.phar install` command to ins
 	"minimum-stability": "dev",
 	"require":
 	{
-		"icybee/module-files": "*"
+		"icybee/module-files": "2.x"
 	}
 }
 ```
@@ -67,7 +73,7 @@ directory can later be cleaned with the `make clean` command.
 
 The package is continuously tested by [Travis CI](http://about.travis-ci.org/).
 
-[![Build Status](https://travis-ci.org/Icybee/module-files.png?branch=master)](https://travis-ci.org/Icybee/module-files)
+[![Build Status](https://travis-ci.org/Icybee/module-files.png?branch=2.0)](https://travis-ci.org/Icybee/module-files)
 
 
 
@@ -76,4 +82,4 @@ The package is continuously tested by [Travis CI](http://about.travis-ci.org/).
 
 ## License
 
-The package is licensed under the New BSD License - See the LICENSE file for details.
+The package is licensed under the New BSD License - See the [LICENSE](LICENSE) file for details.
