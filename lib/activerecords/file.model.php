@@ -82,7 +82,7 @@ class Model extends \Icybee\Modules\Nodes\Model
 
 			$root = $_SERVER['DOCUMENT_ROOT'];
 			$file = basename($properties[File::PATH]);
-			$path = $core->config['repository.temp'] . '/' . $file;
+			$path = \ICanBoogie\strip_root(\ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . $file);
 
 			if (is_file($root . $path))
 			{
@@ -207,7 +207,7 @@ class Model extends \Icybee\Modules\Nodes\Model
 		global $core;
 		//\ICanBoogie\log('makePath with: \1', array($properties));
 
-		$rc = $core->config['repository.files'];
+		$rc = \ICanBoogie\strip_root(\ICanBoogie\REPOSITORY . 'files');
 
 		$mime = $properties[File::MIME];
 

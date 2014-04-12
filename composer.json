@@ -12,17 +12,30 @@
 			"role" : "Developer"
 		}
 	],
+
 	"support": {
 		"issues": "https://github.com/Icybee/module-files/issues",
 		"source": "https://github.com/Icybee/module-files"
 	},
+
 	"minimum-stability": "dev",
+
 	"require": {
 		"php": ">=5.3.0",
 		"icanboogie/module-installer": "*",
 		"icybee/module-nodes": "2.x"
 	},
+
+	"require-dev": {
+		"icanboogie/icanboogie": "2.x",
+		"icanboogie/i18n": "2.x"
+	},
+
 	"autoload": {
 		"classmap": [ "lib" ]
+	},
+
+	"scripts": {
+		"post-autoload-dump": "ICanBoogie\\AutoConfig\\Generator::on_autoload_dump"
 	}
 }

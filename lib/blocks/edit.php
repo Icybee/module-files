@@ -52,9 +52,9 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 	{
 		global $core;
 
-		$folder = $core->config['repository.temp'];
+		$folder = \ICanBoogie\REPOSITORY . 'tmp';
 
-		if (!is_writable($_SERVER['DOCUMENT_ROOT'] . $folder))
+		if (!is_writable($folder))
 		{
 			return array
 			(
@@ -103,9 +103,9 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 			$values[File::TITLE] = $file->name;
 
 			$uploaded_mime = $file->mime;
-			$uploaded_path = $core->config['repository.temp'] . '/' . basename($file->location) . $file->extension;
+			$uploaded_path = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . basename($file->location) . $file->extension;
 
-			$file->move(\ICanBoogie\DOCUMENT_ROOT . $uploaded_path, true);
+			$file->move($uploaded_path, true);
 
 			if (array_key_exists(self::UPLOADED, $options))
 			{

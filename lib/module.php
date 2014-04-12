@@ -21,140 +21,117 @@ class Module extends \Icybee\Modules\Nodes\Module
 
 	const SESSION_UPLOAD_RESPONSE = 'resources.files.upload.responses';
 
-	static protected $repository = array();
-
-	static protected function repository($name)
-	{
-		global $core;
-
-		if (empty(self::$repository[$name]))
-		{
-			self::$repository[$name] = $core->config['repository'] . '/' . $name . '/';
-		}
-
-		return self::$repository[$name];
-	}
-
 	/**
 	 * Overrides the method to create the "/repository/tmp/" and "/repository/files/" directories,
 	 * and add a ".htaccess" file in the "/repository/tmp/" direcotry which denies all access and
 	 * a ".htaccess" file in the "/repository/files/" directory which allows all access.
-	 *
-	 * @see ICanBoogie.Module::install()
 	 */
 	public function install(\ICanBoogie\Errors $errors)
 	{
 		global $core;
 
-		$root = \ICanBoogie\DOCUMENT_ROOT;
-		$path = $core->config['repository.temp'];
+		$repository = \ICanBoogie\REPOSITORY;
 
-		if ($path)
+		#
+		# $repository/tmp
+		#
+
+		$path = $repository . 'tmp';
+
+		if (!file_exists($path))
 		{
-			$path = $root . $path;
+			$parent = dirname($path);
 
-			if (!file_exists($path))
+			if (is_writable($parent))
 			{
-				$parent = dirname($path);
+				mkdir($path);
 
-				if (is_writable($parent))
-				{
-					mkdir($path);
-
-					file_put_contents($path . DIRECTORY_SEPARATOR . '.htaccess', 'Deny from all');
-				}
-				else
-				{
-					$errors[$this->id] = new FormattedString('Unable to create %directory directory, its parent is not writtable', array('%directory' => $path));
-				}
+				file_put_contents($path . DIRECTORY_SEPARATOR . '.htaccess', 'Deny from all');
+			}
+			else
+			{
+				$errors[$this->id] = new FormattedString('Unable to create %directory directory, its parent is not writtable.', [ '%directory' => $path ]);
 			}
 		}
-		else
+
+		#
+		# $repository/files
+		#
+
+		$path = $repository . 'files';
+
+		if (!file_exists($path))
 		{
-			$errors[$this->id] = new FormattedString('The %var var is empty is core config', array('%var' => 'repository.temp'));
-		}
+			$parent = dirname($path);
 
-		$path = $core->config['repository.files'];
-
-		if ($path)
-		{
-			$path = $root . $path;
-
-			if (!file_exists($path))
+			if (is_writable($parent))
 			{
-				$parent = dirname($path);
+				mkdir($path);
 
-				if (is_writable($parent))
-				{
-					mkdir($path);
-
-					file_put_contents($path . DIRECTORY_SEPARATOR . '.htaccess', 'Allow from all');
-				}
-				else
-				{
-					$errors[$this->id] = new FormattedString('Unable to create %directory directory, its parent is not writtable', array('%directory' => $path));
-				}
+				file_put_contents($path . DIRECTORY_SEPARATOR . '.htaccess', 'Allow from all');
 			}
-		}
-		else
-		{
-			$errors[$this->id] = new FormattedString('The %var var is empty is core config', array('%var' => 'repository.files'));
+			else
+			{
+				$errors[$this->id] = new FormattedString('Unable to create %directory directory, its parent is not writtable', [ '%directory' => $path ]);
+			}
 		}
 
 		return parent::install($errors);
 	}
 
 	/**
-	 * Overrides the method to check if the "tmp" and "files" directories exist in the repository.
+	 * Checks that the "tmp" and "files" directories exist in the repository.
 	 */
 	public function is_installed(\ICanBoogie\Errors $errors)
 	{
 		global $core;
 
-		$root = \ICanBoogie\DOCUMENT_ROOT;
-		$path = $core->config['repository.temp'];
+		$repository = \ICanBoogie\DOCUMENT_ROOT;
 
-		if (!is_dir($root . $path))
+		#
+		# $repository/tmp
+		#
+
+		$path = $repository . 'tmp';
+
+		if (!is_dir($path))
 		{
-			$errors[$this->id] = new FormattedString('The %directory directory is missing.', array('%directory' => $path));
+			$errors[$this->id] = new FormattedString('The %directory directory is missing.', [ '%directory' => $path ]);
 		}
 
-		$path = $core->config['repository.files'];
+		#
+		# $repository/files
+		#
 
-		if (!is_dir($root . $path))
+		$path = $repository . 'files';
+
+		if (!is_dir($path))
 		{
-			$errors[$this->id] = new FormattedString('The %directory directory is missing.', array('%directory' => $path));
+			$errors[$this->id] = new FormattedString('The %directory directory is missing.', [ '%directory' => $path ]);
 		}
 
 		return parent::is_installed($errors);
 	}
 
-	public function clean_repository($repository=':repository.temp', $lifetime=3600)
+	public function clean_repository($lifetime=3600)
 	{
-		global $core;
+		$path = \ICanBoogie\REPOSITORY . 'tmp';
 
-		$root = $_SERVER['DOCUMENT_ROOT'];
-
-		if ($repository{0} == ':')
+		if (!is_dir($path))
 		{
-			$repository = $core->config[substr($repository, 1)];
-		}
-
-		if (!is_dir($root . $repository))
-		{
-			\ICanBoogie\log_error('The directory %directory does not exists', array('%directory' => $repository));
+			\ICanBoogie\log_error('The directory %directory does not exists', [ '%directory' => $path ]);
 
 			return;
 		}
 
-		if (!is_writable($root . $repository))
+		if (!is_writable($path))
 		{
-			\ICanBoogie\log_error('The directory %directory is not writtable', array('%directory' => $repository));
+			\ICanBoogie\log_error('The directory %directory is not writtable', [ '%directory' => $path ]);
 
 			return;
 		}
 
-		$dh = opendir($root . $repository);
+		$dh = opendir($path);
 
 		if (!$dh)
 		{
@@ -164,7 +141,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 		$now = time();
 		$location = getcwd();
 
-		chdir($root . $repository);
+		chdir($path);
 
 		while ($file = readdir($dh))
 		{
@@ -179,14 +156,12 @@ class Module extends \Icybee\Modules\Nodes\Module
 			{
 				unlink($file);
 
-				\ICanBoogie\log
-				(
-					'The temporary file %file has been deleted form the repository %directory', array
-					(
-						'%file' => $file,
-						'%directory' => $repository
-					)
-				);
+				\ICanBoogie\log('The temporary file %file has been deleted form the repository %directory', [
+
+					'%file' => $file,
+					'%directory' => $path
+
+				]);
 			}
 		}
 
