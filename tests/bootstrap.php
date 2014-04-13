@@ -29,7 +29,7 @@ $core = new \ICanBoogie\Core(\ICanBoogie\array_merge_recursive(\ICanBoogie\get_a
 
 	'module-path' => [
 
-		__DIR__ . '/../'
+		realpath(__DIR__ . '/../')
 
 	]
 
@@ -56,18 +56,17 @@ foreach (array_keys($core->modules->enabled_modules_descriptors) as $module_id)
 	}
 	catch (\Exception $e)
 	{
-		echo $e;
-		exit;
+		$errors[$module_id] = "Unable to install module: " . $e->getMessage();
 	}
-}
-
-foreach ($errors as $error)
-{
-	echo "$module_id: $error\n";
 }
 
 if ($errors->count())
 {
+	foreach ($errors as $error)
+	{
+		echo "$module_id: $error\n";
+	}
+
 	exit(1);
 }
 
