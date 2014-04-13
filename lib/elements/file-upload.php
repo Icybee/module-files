@@ -54,22 +54,4 @@ class FileUpload extends \Brickrouge\File
 
 		return $rc;
 	}
-
-	protected function alter_dataset(array $dataset)
-	{
-		$limit = $this[self::FILE_WITH_LIMIT] ?: 2 * 1024;
-
-		if ($limit === true)
-		{
-			$limit = ini_get('upload_max_filesize') * 1024;
-		}
-
-		return array
-		(
-			'name' => $this['name'],
-			'max-file-size' => $limit * 1024
-		)
-
-		+ parent::alter_dataset($dataset);
-	}
 }

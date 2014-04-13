@@ -21,8 +21,6 @@ class Model extends \Icybee\Modules\Nodes\Model
 
 	public function save(array $properties, $key=null, array $options=array())
 	{
-		global $core;
-
 		#
 		# because the newly uploaded file might not overrite the previous file if there extensions
 		# don't match, we use the $delete variable to delete the previous file. the variable
@@ -86,15 +84,8 @@ class Model extends \Icybee\Modules\Nodes\Model
 
 			if (is_file($root . $path))
 			{
-				$mime = Uploaded::getMIME($root . $path);
-				$size = filesize($root . $path);
-
 				$delete = $previous_path;
-
 				$previous_path = $path;
-
-				$properties[File::MIME] = $mime;
-				$properties[File::SIZE] = $size;
 
 				#
 				# setting `previous_title` to null will force the update
@@ -204,7 +195,6 @@ class Model extends \Icybee\Modules\Nodes\Model
 
 	static protected function makePath($key, array $properties)
 	{
-		global $core;
 		//\ICanBoogie\log('makePath with: \1', array($properties));
 
 		$rc = \ICanBoogie\strip_root(\ICanBoogie\REPOSITORY . 'files');

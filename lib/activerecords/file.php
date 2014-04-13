@@ -14,7 +14,8 @@ namespace Icybee\Modules\Files;
 /**
  * Representation of a managed file.
  *
- * @property-read string $extension The file extension.
+ * @property-read string $extension The file extension. If any, the extension includes the dot,
+ * e.g. ".zip".
  */
 class File extends \Icybee\Modules\Nodes\Node
 {
@@ -68,7 +69,14 @@ class File extends \Icybee\Modules\Nodes\Node
 	 */
 	protected function get_extension()
 	{
-		return '.' . pathinfo($this->path, PATHINFO_EXTENSION);
+		$extension = pathinfo($this->path, PATHINFO_EXTENSION);
+
+		if (!$extension)
+		{
+			return;
+		}
+
+		return '.' . $extension;
 	}
 
 	public function url($type='view')

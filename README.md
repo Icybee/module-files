@@ -1,4 +1,4 @@
-# Files [![Build Status](https://travis-ci.org/Icybee/module-files.png?branch=2.0)](https://travis-ci.org/Icybee/module-files)
+# Files [![Build Status](https://travis-ci.org/Icybee/module-files.png?branch=2.1)](https://travis-ci.org/Icybee/module-files)
 
 The module "Files" (`files`) manages the files uploaded by the users of the
 CMS [Icybee](http://icybee.org/).
@@ -31,7 +31,7 @@ Create a `composer.json` file and run `php composer.phar install` command to ins
 	"minimum-stability": "dev",
 	"require":
 	{
-		"icybee/module-files": "2.x"
+		"icybee/module-files": "2.1.x"
 	}
 }
 ```
@@ -73,7 +73,7 @@ directory can later be cleaned with the `make clean` command.
 
 The package is continuously tested by [Travis CI](http://about.travis-ci.org/).
 
-[![Build Status](https://travis-ci.org/Icybee/module-files.png?branch=2.0)](https://travis-ci.org/Icybee/module-files)
+[![Build Status](https://travis-ci.org/Icybee/module-files.png?branch=2.1)](https://travis-ci.org/Icybee/module-files)
 
 
 

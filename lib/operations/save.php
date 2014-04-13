@@ -12,14 +12,30 @@
 namespace Icybee\Modules\Files;
 
 use ICanBoogie\HTTP\Request;
-use ICanBoogie\Uploaded;
 
+/**
+ * Save a file.
+ *
+ * @property-read \ICanBoogie\HTTP\File|null $file The file associated with the request.
+ */
 class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 {
 	/**
-	 * @var Uploaded|bool The optional file to save with the record.
+	 * Name of the _userfile_ slot.
+	 *
+	 * @var string
+	 */
+	const USERFILE = 'path';
+
+	/**
+	 * @var \ICanBoogie\HTTP\File|bool The optional file to save with the record.
 	 */
 	protected $file;
+
+	protected function get_file()
+	{
+		return $this->file;
+	}
 
 	/**
 	 * @var array Accepted file types.
@@ -38,18 +54,17 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 		unset($properties[File::MIME]);
 		unset($properties[File::SIZE]);
 
-		#
-		# TODO-20100624: Using the 'file' property might be the way to go
-		#
+		$file = $this->file;
 
-		if (isset($properties['file']))
+		if ($file && $file->is_valid)
 		{
-			$properties[File::PATH] = $properties['file'];
+			$properties[File::MIME] = $file->type;
+			$properties[File::SIZE] = $file->size;
 		}
 
 		#
 		# File:PATH is set to true when the file is not mandatory and there is no uploaded file in
-		# order fot the form still validates, in which case the property must be unset, otherwise
+		# order for the form still validates, in which case the property must be unset, otherwise
 		# the boolean is used a the new path.
 		#
 
@@ -87,32 +102,29 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 	{
 		global $core;
 
-		$this->file = null;
 		$request = $this->request;
 
-		if (empty($request[File::PATH]))
+		/* @var $file \ICanBoogie\HTTP\File */
+
+		$this->file = $file = $request->files[self::USERFILE];
+
+		if ($file && $file->is_valid)
 		{
-			$required = empty($this->key);
-			$file = new Uploaded(File::PATH, $this->accept, $required);
+			$filename = uniqid(null, true) . $file->extension;
+			$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . $filename;
 
-			$this->file = $file;
+			$file->move($pathname);
 
-			if ($file->location)
+			$request[File::PATH] = \ICanBoogie\strip_root($pathname);
+
+			if (!$request[File::TITLE])
 			{
-				$path = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . basename($file->location) . $file->extension;
-				$file->move($path, true);
-
-				$request[File::PATH] = \ICanBoogie\strip_root($path);
-
-				if (empty($request[File::TITLE]))
-				{
-					$request[File::TITLE] = $file->name;
-				}
+				$request[File::TITLE] = $file->unsuffixed_name;
 			}
-			else if (!$required)
-			{
-				$request[File::PATH] = true;
-			}
+		}
+		else if ($file && $this->key)
+		{
+			unset($request[File::PATH]);
 		}
 
 		return parent::control($controls);
@@ -123,18 +135,35 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 	 */
 	protected function validate(\ICanboogie\Errors $errors)
 	{
+		global $core;
+
 		$file = $this->file;
 
-		if ($file && $file->er)
+		if ($file)
 		{
-			$errors[File::PATH] = $errors->format('Unable to upload file %file: :message.', [
+			$error_message = $file->error_message;
 
-				'%file' => $file->name,
-				':message' => $file->er_message
+			$max_file_size = $core->registry["{$this->module->flat_id}.max_file_size"];
 
-			]);
+			if ($max_file_size && $max_file_size < $file->size)
+			{
+				$error_message = $errors->format("Maximum file size is :size Mb", [ ':size' => round($max_file_size / 1024) ]);
+			}
 
-			return false;
+			if ($this->accept && !$file->match($this->accept))
+			{
+				$error_message = $errors->format("Only the following file types are accepted: %accepted.", [ '%accepted' => implode(', ', $this->accept) ]);
+			}
+
+			if ($error_message)
+			{
+				$errors[File::PATH] = $errors->format('Unable to upload file %file: :message.', [
+
+					'%file' => $file->name,
+					':message' => $error_message
+
+				]);
+			}
 		}
 
 		return parent::validate($errors);

@@ -16,9 +16,6 @@ use ICanBoogie\Uploaded;
 class Module extends \Icybee\Modules\Nodes\Module
 {
 	const OPERATION_UPLOAD = 'upload';
-	const OPERATION_UPLOAD_RESPONSE = 'uploadResponse';
-
-	const SESSION_UPLOAD_RESPONSE = 'resources.files.upload.responses';
 
 	/**
 	 * Overrides the method to create the "/repository/tmp/" and "/repository/files/" directories,
@@ -74,6 +71,12 @@ class Module extends \Icybee\Modules\Nodes\Module
 				$errors[$this->id] = $errors->format('Unable to create %directory directory, its parent is not writtable', [ '%directory' => $path ]);
 			}
 		}
+
+		#
+		# config: max_file_size
+		#
+
+		$core->registry["{$this->flat_id}.max_file_size"] = 16000;
 
 		return parent::install($errors);
 	}

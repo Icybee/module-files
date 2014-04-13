@@ -11,14 +11,25 @@
 
 namespace Icybee\Modules\Files;
 
+use ICanBoogie\HTTP\Request;
 use ICanBoogie\Uploaded;
 
+/**
+ * Upload a file to the repository's temporary folder.
+ *
+ * @property-read \ICanBoogie\HTTP\File $file The uploaded file.
+ */
 class UploadOperation extends \ICanBoogie\Operation
 {
 	/**
-	 * @var Uploaded The target file of the operation.
+	 * @var \ICanBoogie\HTTP\File The target file of the operation.
 	 */
 	protected $file;
+
+	protected function get_file()
+	{
+		return $this->file;
+	}
 
 	/**
 	 * @var array Accepted file types.
@@ -38,66 +49,70 @@ class UploadOperation extends \ICanBoogie\Operation
 		+ parent::get_controls();
 	}
 
-	public function reset()
+	public function __invoke(Request $request)
 	{
-		parent::reset();
-
 		$this->module->clean_temporary_files();
+
+		return parent::__invoke($request);
 	}
 
 	/**
 	 * Validates the operation if the file upload succeeded.
-	 *
-	 * @see ICanBoogie.Operation::validate()
 	 */
 	protected function validate(\ICanboogie\Errors $errors)
 	{
+		global $core;
+
 		#
 		# forces 'application/json' response type
 		#
 
 		$_SERVER['HTTP_ACCEPT'] = 'application/json';
 
-		#
-		# TODO-20100624: we use 'Filedata' because it's used by Swiff.Uploader. We need to change
-		# that as soon as possible.
-		#
+		$this->file = $file = $this->request->files['path'];
 
-		$file = new Uploaded('path', $this->accept, true);
-
-		$this->file = $file;
-		$this->response['file'] = $file;
-
-		if ($file->er)
+		if (!$file)
 		{
-			$errors['file'] = $file->er_message;
+			$errors[SaveOperation::USERFILE] = $errors->format("No file was uploaded.");
 
 			return false;
+		}
+
+		$error_message = $file->error_message;
+
+		$max_file_size = $core->registry["{$this->module->flat_id}.max_file_size"];
+
+		if ($max_file_size && $max_file_size < $file->size)
+		{
+			$error_message = $errors->format("Maximum file size is :size Mb", [ ':size' => round($max_file_size / 1024) ]);
+		}
+
+		if (!$file->match($this->accept))
+		{
+			$error_message = $errors->format("Only the following file types are accepted: %accepted.", [ '%accepted' => implode(', ', $this->accept) ]);
+		}
+
+		if ($error_message)
+		{
+			$errors['path'] = $error_message;
 		}
 
 		return true;
 	}
 
-	/**
-	 * @see ICanBoogie.Operation::process()
-	 */
 	protected function process()
 	{
-		global $core;
-
 		$file = $this->file;
-		$path = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . basename($file->location) . $file->extension;
 
-		$file->move($path, true);
+		$filename = uniqid(null, true) . $file->extension;
+		$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . $filename;
 
-		$file->location = \ICanBoogie\strip_root($path);
-		$name = $file->name;
+		$file->move($pathname);
+
+		$title = $file->unsuffixed_name;
+		$pathname = \ICanBoogie\strip_root($pathname);
 
 		$this->response['infos'] = null;
-		$this->response['properties'] = array
-		(
-			'title' => $name
-		);
 
 		if (isset($_SERVER['HTTP_X_USING_FILE_API']))
 		{
@@ -105,13 +120,19 @@ class UploadOperation extends \ICanBoogie\Operation
 
 			$this->response['infos'] = <<<EOT
 <ul class="details">
-	<li><span title="Path: {$file->location}">{$name}</span></li>
-	<li>$file->mime</li>
+	<li><span title="{$pathname}">{$title}</span></li>
+	<li>$file->type</li>
 	<li>$size</li>
 </ul>
 EOT;
 
-			return true;
 		}
+
+		return array_merge($file->to_array(), [
+
+			'title' => $title,
+			'pathname' => $pathname
+
+		]);
 	}
 }

@@ -137,33 +137,28 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 			)
 		);
 
-		return array_merge
-		(
-			parent::lazy_get_children(), array
+		return array_merge(parent::lazy_get_children(), [
+
+			File::PATH => new $uploader_class([
+
+				Form::LABEL => 'file',
+				Element::REQUIRED => empty($entry_nid),
+				\Brickrouge\File::FILE_WITH_LIMIT => $core->site->metas[$this->module->flat_id . '.max_file_size'],
+				Element::WEIGHT => -100,
+				\Brickrouge\File::T_UPLOAD_URL => Operation::encode($this->module->id . '/upload')
+
+			]),
+
+			File::DESCRIPTION => new RTEEditorElement
 			(
-				File::PATH => new $uploader_class
+				array
 				(
-					array
-					(
-						Form::LABEL => 'file',
-						Element::REQUIRED => empty($entry_nid),
-						\Brickrouge\File::FILE_WITH_LIMIT => $core->site->metas[$this->module->flat_id . '.max_file_size'],
-						Element::WEIGHT => -100,
-						\Brickrouge\File::T_UPLOAD_URL => Operation::encode($this->module->id . '/upload')
-					)
-				),
+					Form::LABEL => 'description',
+					Element::WEIGHT => 50,
 
-				File::DESCRIPTION => new RTEEditorElement
-				(
-					array
-					(
-						Form::LABEL => 'description',
-						Element::WEIGHT => 50,
-
-						'rows' => 5
-					)
+					'rows' => 5
 				)
 			)
-		);
+		]);
 	}
 }
