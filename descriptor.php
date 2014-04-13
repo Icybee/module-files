@@ -10,6 +10,7 @@ return array
 	Module::T_CATEGORY => 'resources',
 	Module::T_DESCRIPTION => 'Foundation for file management',
 	Module::T_EXTENDS => 'nodes',
+	Module::T_ID => 'files',
 	Module::T_MODELS => array
 	(
 		'primary' => array
