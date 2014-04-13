@@ -20,7 +20,7 @@ window.addEvent('load', function() {
 
 		widget.addEvent('change', function(response) {
 
-			Object.each(response.properties, function(value, key) {
+			Object.each(response.rc, function(value, key) {
 
 				var control = document.id(form.elements[key])
 
