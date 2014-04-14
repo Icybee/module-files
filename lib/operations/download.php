@@ -11,8 +11,6 @@
 
 namespace Icybee\Modules\Files;
 
-use ICanBoogie\HTTP\HTTPError;
-
 /**
  * Downloads a file.
  *
@@ -20,98 +18,23 @@ use ICanBoogie\HTTP\HTTPError;
  *
  * Offline files cannot be downloaded by visitors.
  */
-class DownloadOperation extends \ICanBoogie\Operation
+class DownloadOperation extends GetOperation
 {
-	/**
-	 * Controls for the operation: record.
-	 */
-	protected function get_controls()
-	{
-		return array
-		(
-			self::CONTROL_RECORD => true
-		)
-
-		+ parent::get_controls();
-	}
-
-	/**
-	 * Overrides the method to check the availability of the record to the requesting user.
-	 *
-	 * @throws HTTPException with HTTP code 401, if the user is a guest and the record is
-	 * offline.
-	 */
-	protected function control_record()
-	{
-		global $core;
-
-		$record = parent::control_record();
-
-		if ($core->user->is_guest && !$record->is_online)
-		{
-			throw new HTTPError
-			(
-				\ICanBoogie\format('The requested resource requires authentication: %resource', array
-				(
-					'%resource' => $record->constructor . '/' . $this->key
-				)),
-
-				401
-			);
-		}
-
-		return $record;
-	}
-
-	protected function validate(\ICanboogie\Errors $errors)
-	{
-		return true;
-	}
-
-	// TODO-20090512: Implement Accept-Range
 	protected function process()
 	{
-		$record = $this->record;
-		$filename = $record->title . $record->extension;
+		$rc = parent::process();
 
-		$response = $this->response;
-		$response->headers['Content-Description'] = 'File Transfer';
-		$response->headers['Content-Disposition']->type = 'attachment';
-		$response->headers['Content-Disposition']->filename = $filename;
-		$response->headers['Content-Type'] = $record->mime;
-		$response->headers['Content-Transfer-Encodin'] = 'binary';
-		$response->headers['Content-Length'] = $record->size;
-
-		$fh = fopen(\ICanBoogie\DOCUMENT_ROOT . $record->path, 'rb');
-
-		if (!$fh)
+		if ($rc instanceof \Closure)
 		{
-			throw new HTTPError("Unable to lock file.");
+			$record = $this->record;
+			$response = $this->response;
+
+			$response->headers['Content-Description'] = 'File Transfer';
+			$response->headers['Content-Disposition']->type = 'attachment';
+			$response->headers['Content-Disposition']->filename = $record->title . $record->extension;
+			$response->headers['Content-Transfer-Encoding'] = 'binary';
 		}
 
-		return function() use ($fh)
-		{
-			#
-			# Reset time limit for big files
-			#
-
-			if (!ini_get('safe_mode'))
-			{
-				set_time_limit(0);
-			}
-
-			while (!feof($fh) && !connection_aborted())
-			{
-				echo fread($fh, 1024 * 8);
-
-				#
-				# flushing frees memory used by the PHP buffer
-				#
-
-				flush();
-			}
-
-			fclose($fh);
-		};
+		return $rc;
 	}
 }
