@@ -88,7 +88,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 	{
 		global $core;
 
-		$repository = \ICanBoogie\DOCUMENT_ROOT;
+		$repository = \ICanBoogie\REPOSITORY;
 
 		#
 		# $repository/tmp
