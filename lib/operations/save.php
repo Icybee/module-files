@@ -127,11 +127,20 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 			}
 		}
 
-		$this->file = $file;
-
 		unset($request[File::PATH]);
 		unset($request[File::MIME]);
 		unset($request[File::SIZE]);
+
+		$this->file = $file;
+
+		if ($file)
+		{
+			#
+			# This is used during form validation.
+			#
+
+			$request[File::PATH] = true;
+		}
 
 		return parent::control($controls);
 	}
