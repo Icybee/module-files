@@ -23,6 +23,7 @@ class File extends \Icybee\Modules\Nodes\Node
 	const MIME = 'mime';
 	const SIZE = 'size';
 	const DESCRIPTION = 'description';
+	const HTTP_FILE = 'file';
 
 	/**
 	 * Path of the file, relative to the DOCUMENT_ROOT.
@@ -50,7 +51,7 @@ class File extends \Icybee\Modules\Nodes\Node
 	 *
 	 * @var string
 	 */
-	public $description;
+	public $description = '';
 
 	/**
 	 * Defaults the model to "files".
@@ -58,6 +59,43 @@ class File extends \Icybee\Modules\Nodes\Node
 	public function __construct($model='files')
 	{
 		parent::__construct($model);
+	}
+
+	/**
+	 * If {@link HTTP_FILE} is defined, the {@link \ICanBoogie\HTTP\File} instance is used to
+	 * set the {@link $mime} and {@link $size} properties, as well as the {@link $title} property
+	 * if it is empty.
+	 *
+	 * After the record is saved, the {@link HTTP_FILE} property is removed. Also, the
+	 * {@link $path} property is updated.
+	 */
+	public function save()
+	{
+		if (isset($this->{ self::HTTP_FILE }))
+		{
+			/* @var $file \ICanBoogie\HTTP\File */
+
+			$file = $this->{ self::HTTP_FILE };
+
+			$this->mime = $file->type;
+			$this->size = $file->size;
+
+			if (!$this->title)
+			{
+				$this->title = $file->unsuffixed_name;
+			}
+		}
+
+		$rc = parent::save();
+
+		unset($this->{ self::HTTP_FILE });
+
+		if ($rc)
+		{
+			$this->path = $this->model->select(self::PATH)->filter_by_nid($rc)->rc;
+		}
+
+		return $rc;
 	}
 
 	/**

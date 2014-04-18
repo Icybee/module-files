@@ -29,10 +29,6 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 			Operation::DESTINATION => 'files',
 			Operation::NAME => 'save',
 
-			'siteid' => 0,
-			'nativeid' => 0,
-			'language' => '',
-			'description' => '',
 			'MAX_FILE_SIZE' => 16000000
 
 		]
@@ -103,6 +99,25 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 		];
 	}
 
+	public function test_empty()
+	{
+		$request = Request::from(self::$request_basic_properties);
+		$operation = new FakeSaveOperation;
+
+		try
+		{
+			$response = $operation($request);
+
+			$this->fail("The Failure exception should have been raise.");
+		}
+		catch (\ICanBoogie\Operation\Failure $e)
+		{
+			$errors = $e->operation->response->errors;
+
+			$this->assertNotNull($errors[File::PATH]);
+		}
+	}
+
 	public function test_successful()
 	{
 		$source_pathname = __FILE__;
@@ -135,9 +150,30 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals(filesize($source_pathname), $record->size);
 		$this->assertEquals('application/x-php', $record->mime);
 
+		# save again
+
+		$path = $record->path;
+
+		$request = Request::from(\ICanBoogie\array_merge_recursive(self::$request_basic_properties, [
+
+			'request_params' => $record->to_array() + [
+
+				Operation::KEY => $record->nid
+
+			]
+
+		]));
+
+		$operation = new FakeSaveOperation;
+		$response = $operation($request);
+
+		$this->assertTrue($response->is_successful);
+		$this->assertEquals($path, $record->path);
+
 		# cleanup
 
 		$record->delete();
+		$this->assertFileNotExists(dirname(\ICanBoogie\REPOSITORY) . $record->path);
 	}
 }
 

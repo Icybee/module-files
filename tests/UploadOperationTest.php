@@ -15,6 +15,7 @@ use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
 
 use Icybee\Modules\Files\UploadOperationTest\FakeUploadOperation;
+use Icybee\Modules\Files\UploadOperationTest\FakeSaveOperation;
 
 /* @var $response \ICanBoogie\Operation\Response */
 
@@ -125,6 +126,59 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals(filesize($source), $rc['size']);
 		$this->assertEquals('application/x-php', $rc['type']);
 		$this->assertStringStartsWith('/repository/tmp/', $rc['pathname']);
+
+		$this->assertFileExists(\ICanBoogie\DOCUMENT_ROOT . $rc['pathname']);
+		$this->assertFileExists(\ICanBoogie\DOCUMENT_ROOT . $rc['pathname'] . '.info');
+		$this->assertJsonStringEqualsJsonString(json_encode($operation->file->to_array()), file_get_contents(\ICanBoogie\DOCUMENT_ROOT . $rc['pathname'] . '.info'));
+	}
+
+	/**
+	 * @depends test_successful
+	 */
+	public function test_save_uploaded()
+	{
+		$source = __FILE__;
+		$pathname = DIR . 'tests/sandbox/' . basename(__FILE__);
+
+		copy($source, $pathname);
+
+		$request = Request::from(self::$request_basic_properties + [
+
+			'files' => [
+
+				SaveOperation::USERFILE => [ 'pathname' => $pathname ]
+
+			]
+
+		]);
+
+		$operation = new FakeUploadOperation;
+		$response = $operation($request);
+		$rc = $response->rc;
+		$this->assertArrayHasKey('pathname', $rc);
+
+		$request = Request::from(\ICanBoogie\array_merge_recursive(self::$request_basic_properties, [
+
+			'request_params' => [
+
+				'path' => $rc['pathname']
+
+			]
+
+		]));
+
+		$operation = new FakeSaveOperation;
+		$response = $operation($request);
+
+		$this->assertTrue($response->is_successful);
+
+		$record = $operation->record;
+		$file = $operation->file;
+
+		$this->assertStringEndsWith($file->extension, $record->path);
+		$this->assertEquals($file->type, $record->mime);
+		$this->assertEquals($file->size, $record->size);
+		$this->assertEquals($file->unsuffixed_name, $record->title);
 	}
 }
 
@@ -141,5 +195,26 @@ class FakeUploadOperation extends \Icybee\Modules\Files\UploadOperation
 		$this->module = $core->modules['files'];
 
 		return parent::__invoke($request);
+	}
+}
+
+class FakeSaveOperation extends \Icybee\Modules\Files\SaveOperation
+{
+	public function __invoke(Request $request)
+	{
+		global $core;
+
+		$this->module = $core->modules['files'];
+
+		return parent::__invoke($request);
+	}
+
+	protected function get_controls()
+	{
+		return [
+
+			self::CONTROL_FORM => false
+
+		] + parent::get_controls();
 	}
 }

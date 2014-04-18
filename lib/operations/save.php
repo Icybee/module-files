@@ -12,6 +12,7 @@
 namespace Icybee\Modules\Files;
 
 use ICanBoogie\HTTP\Request;
+use ICanBoogie\strip_root;
 
 /**
  * Save a file.
@@ -49,18 +50,11 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 	 */
 	protected function lazy_get_properties()
 	{
-		$properties = parent::lazy_get_properties();
+		$properties = parent::lazy_get_properties() + [
 
-		unset($properties[File::MIME]);
-		unset($properties[File::SIZE]);
+			'description' => ''
 
-		$file = $this->file;
-
-		if ($file && $file->is_valid)
-		{
-			$properties[File::MIME] = $file->type;
-			$properties[File::SIZE] = $file->size;
-		}
+		];
 
 		#
 		# File:PATH is set to true when the file is not mandatory and there is no uploaded file in
@@ -71,6 +65,11 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 		if (isset($properties[File::PATH]) && $properties[File::PATH] === true)
 		{
 			unset($properties[File::PATH]);
+		}
+
+		if ($this->file)
+		{
+			$properties[File::HTTP_FILE] = $this->file;
 		}
 
 		return $properties;
@@ -104,28 +103,35 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 
 		$request = $this->request;
 
+		$path = $request[File::PATH];
+		$file = null;
+
 		/* @var $file \ICanBoogie\HTTP\File */
 
-		$this->file = $file = $request->files[self::USERFILE];
+		$file = $request->files[self::USERFILE];
 
 		if ($file && $file->is_valid)
 		{
-			$filename = uniqid(null, true) . $file->extension;
+			$filename = strtr(uniqid(null, true), '.', '-') . $file->extension;
 			$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . $filename;
 
 			$file->move($pathname);
+		}
+		else if ($path && strpos($path, \ICanBoogie\strip_root(\ICanBoogie\REPOSITORY . "files")) !== 0)
+		{
+			$file = $this->resolve_request_file_from_pathname($path);
 
-			$request[File::PATH] = \ICanBoogie\strip_root($pathname);
-
-			if (!$request[File::TITLE])
+			if (!$file)
 			{
-				$request[File::TITLE] = $file->unsuffixed_name;
+				$this->response->errors[File::PATH] = $this->response->errors->format("Invalid or delete file: %pathname", [ 'pathname' => $path ]);
 			}
 		}
-		else if ($file && $this->key)
-		{
-			unset($request[File::PATH]);
-		}
+
+		$this->file = $file;
+
+		unset($request[File::PATH]);
+		unset($request[File::MIME]);
+		unset($request[File::SIZE]);
 
 		return parent::control($controls);
 	}
@@ -165,6 +171,10 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 				]);
 			}
 		}
+		else if (!$this->key)
+		{
+			$errors[File::PATH] = $errors->format("File is required.");
+		}
 
 		return parent::validate($errors);
 	}
@@ -193,6 +203,26 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 		}
 
 		return $rc;
+	}
+
+	protected function resolve_request_file_from_pathname($pathname)
+	{
+		$filename = basename($pathname);
+		$info_pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . $filename . '.info';
+
+		if (!file_exists($info_pathname))
+		{
+			return;
+		}
+
+		$properties = json_decode(file_get_contents($info_pathname), true);
+
+		if (!$properties)
+		{
+			return;
+		}
+
+		return \ICanBoogie\HTTP\File::from($properties);
 	}
 }
 

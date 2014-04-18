@@ -78,8 +78,8 @@ class GetOperation extends \ICanBoogie\Operation
 		/* @var $record File */
 		$record = $this->record;
 		$pathname = \ICanBoogie\DOCUMENT_ROOT . $record->path;
-		$stat = stat($pathname);
 		$hash = sha1_file($pathname);
+		$modified_time = filemtime($pathname);
 
 		$response = $this->response;
 		$response->cache_control->cacheable = 'public';
@@ -94,8 +94,8 @@ class GetOperation extends \ICanBoogie\Operation
 			$if_none_match = $request->headers['If-None-Match'];
 			$if_modified_since = $request->headers['If-Modified-Since'];
 
-			if ($if_modified_since && $if_modified_since->timestamp >= $stat['mtime']
-			&& trim($if_none_match) == $hash)
+			if (!$if_modified_since->is_empty && $if_modified_since->timestamp >= $modified_time
+			&& $if_none_match == $hash)
 			{
 				$response->status = 304;
 
@@ -109,7 +109,7 @@ class GetOperation extends \ICanBoogie\Operation
 
 		$response->content_type = $record->mime;
 		$response->content_length = $record->size;
-		$response->last_modified = $record->updated_at;
+		$response->last_modified = $modified_time;
 
 		$fh = fopen($pathname, 'rb');
 

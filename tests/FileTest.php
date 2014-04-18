@@ -30,11 +30,46 @@ class FileTest extends \PHPUnit_Framework_TestCase
 	{
 		return [
 
-			[ '.png', [ 'path' => '/path/to/image.png' ] ],
+			[ '.png',      [ 'path' => '/path/to/image.png' ] ],
 			[ '.document', [ 'path' => '/path/to/image.document' ] ],
-			[ '.gz', [ 'path' => '/path/to/image.tar.gz' ] ],
-			[ '', [ 'path' => '/path/to/image' ] ]
+			[ '.gz',       [ 'path' => '/path/to/image.tar.gz' ] ],
+			[ '',          [ 'path' => '/path/to/image' ] ]
 
 		];
+	}
+
+	public function test_save()
+	{
+		$title = uniqid(null, true);
+		$filename = $title . ".php";
+		$pathname = \ICanBoogie\REPOSITORY . "tmp/{$filename}";
+
+		copy(__FILE__, $pathname);
+		$size = filesize($pathname);
+
+		$record = File::from([
+
+			File::HTTP_FILE => \ICanBoogie\HTTP\File::from([ 'pathname' => $pathname ])
+
+		]);
+
+		$nid = $record->save();
+
+		$this->assertEquals($nid, $record->nid);
+		$this->assertEquals("/repository/files/bin/{$nid}-" . \ICanBoogie\normalize($title) . ".php", $record->path);
+		$this->assertEquals("application/x-php", $record->mime);
+		$this->assertEquals($size, $record->size);
+		$this->assertEquals($title, $record->title);
+		$this->assertFileExists(dirname(\ICanBoogie\REPOSITORY) . $record->path);
+		$this->assertObjectNotHasAttribute(File::HTTP_FILE, $record);
+
+		$record->title = "Madonna";
+		$record->save();
+
+		$this->assertEquals("/repository/files/bin/{$nid}-madonna.php", $record->path);
+		$this->assertFileExists(dirname(\ICanBoogie\REPOSITORY) . $record->path);
+
+		$record->delete();
+		$this->assertFileNotExists(dirname(\ICanBoogie\REPOSITORY) . $record->path);
 	}
 }

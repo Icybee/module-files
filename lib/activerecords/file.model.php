@@ -37,15 +37,8 @@ class Model extends \Icybee\Modules\Nodes\Model
 		# If nedded, the file is renamed after the entry has been saved.
 		#
 
-		$title = null;
-
 		$previous_title = null;
 		$previous_path = null;
-
-		if (isset($properties[File::TITLE]))
-		{
-			$title = $properties[File::TITLE];
-		}
 
 		#
 		# If we are modifying an entry, we load its previous values to check for updates related
@@ -69,70 +62,49 @@ class Model extends \Icybee\Modules\Nodes\Model
 			$properties[File::MIME] = $previous_mime;
 		}
 
-		if (!empty($properties[File::PATH]))
+		if (isset($properties[File::HTTP_FILE]))
 		{
-			#
-			# Only the files located in the repository temporary folder can be saved. We need to
-			# check if the file is actually in the repository temporary folder. The file is
-			# required for new entries, so if the file is not defined here, the save process will
-			# fail.
-			#
+			/* @var $file \ICanBoogie\HTTP\File */
 
-			$root = $_SERVER['DOCUMENT_ROOT'];
-			$file = basename($properties[File::PATH]);
-			$path = \ICanBoogie\strip_root(\ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . $file);
+			$file = $properties[File::HTTP_FILE];
 
-			if (is_file($root . $path))
+			$delete = $previous_path;
+			$path = \ICanBoogie\strip_root($file->pathname);
+			$previous_path = $path;
+			$previous_title = null; // setting `previous_title` to null forces the update
+
+			$properties[File::MIME] = $file->type;
+			$properties[File::SIZE] = $file->size;
+
+			if (empty($properties[File::TITLE]))
 			{
-				$delete = $previous_path;
-				$previous_path = $path;
-
-				#
-				# setting `previous_title` to null will force the update
-				#
-
-				$previous_title = null;
-
-				#
-				# setting the UPLOADED value in the options
-				#
-
-				if (array_key_exists(self::UPLOADED, $options))
-				{
-					$options[self::UPLOADED] = $file;
-				}
+				$properties[File::TITLE] = $file->unsuffixed_name;
 			}
-			else if (!$key)
-			{
-				throw new Exception('The file %file is not located in the repository temporary folder (%location)', array('%file' => $file, '%location' => $path));
-			}
+
+			$properties[File::PATH] = $path;
 		}
 
-		$file = null;
+		$title = null;
+
+		if (isset($properties[File::TITLE]))
+		{
+			$title = $properties[File::TITLE];
+		}
+
+		$mime = $properties[File::MIME];
 
 		#
 		# before we continue, we have to check if we can actually move the file to the repository
 		#
 
-		$path = self::makePath($key, array('path' => $previous_path) + $properties);
+		$path = self::make_path($key, $title, $previous_path, $mime);
 
-		//\ICanBoogie\log('path: \1, preivous: \2', array($path, $previous_path));
-
-		//\ICanBoogie\log('file: \1, values: \6 path: \2 ?= \3, title: \4 ?= \5, umask: \6 ', array($file, $previous_path, $path, $previous_title, $title, $properties, umask()));
-
-		$root = $_SERVER['DOCUMENT_ROOT'];
+		$root = \ICanBoogie\DOCUMENT_ROOT;
 		$parent = dirname($path);
 
 		if (!is_dir($root . $parent))
 		{
 			mkdir($root . $parent, 0705, true);
-		}
-
-//		\ICanBoogie\log('path: \1', array($path));
-
-		if (!is_writable($root . $parent))
-		{
-			throw new Exception('The directory %directory is not writable', array('%directory' => $parent));
 		}
 
 		$key = parent::save($properties, $key, $options);
@@ -146,13 +118,9 @@ class Model extends \Icybee\Modules\Nodes\Model
 		# change path according to node's title
 		#
 
-//		\ICanBoogie\log("path: $previous_path ?= $path, title: $previous_title ?= $title");
-
 		if (($path != $previous_path) || (!$previous_title || ($previous_title != $title)))
 		{
-			$path = self::makePath($key, array('path' => $previous_path) + $properties);
-
-			//\ICanBoogie\log('previous_path: %previous_path, path: %path', array('%previous_path' => $previous_path, '%path' => $path));
+			$path = self::make_path($key, $title, $previous_path, $mime);
 
 			if ($delete && is_file($root . $delete))
 			{
@@ -161,14 +129,17 @@ class Model extends \Icybee\Modules\Nodes\Model
 
 			$ok = rename($root . $previous_path, $root . $path);
 
-			if ($ok)
+			if (!$ok)
 			{
-				$this->update(array(File::PATH => $path), $key);
+				throw new \Exception(\ICanBoogie\format('Unable to rename %previous to %path', [
+
+					'previous' => $previous_path,
+					'path' => $path
+
+				]));
 			}
-			else
-			{
-				\ICanBoogie\log_error('Unable to rename %previous to %path', array('%previous' => $previous_path, '%path' => $path));
-			}
+
+			$this->update([ File::PATH => $path ], $key);
 		}
 
 		return $key;
@@ -182,7 +153,7 @@ class Model extends \Icybee\Modules\Nodes\Model
 
 		if ($rc && $path)
 		{
-			$root = $_SERVER['DOCUMENT_ROOT'];
+			$root = \ICanBoogie\DOCUMENT_ROOT;
 
 			if (is_file($root . $path))
 			{
@@ -193,14 +164,8 @@ class Model extends \Icybee\Modules\Nodes\Model
 		return $rc;
 	}
 
-	static protected function makePath($key, array $properties)
+	static protected function make_path($key, $title, $path, $mime)
 	{
-		//\ICanBoogie\log('makePath with: \1', array($properties));
-
-		$rc = \ICanBoogie\strip_root(\ICanBoogie\REPOSITORY . 'files');
-
-		$mime = $properties[File::MIME];
-
 		$base = dirname($mime);
 
 		if ($base == 'application')
@@ -208,34 +173,20 @@ class Model extends \Icybee\Modules\Nodes\Model
 			$base = basename($mime);
 		}
 
-		if (!in_array($base, array('image', 'audio', 'pdf', 'zip')))
+		if (!in_array($base, [ 'image', 'audio', 'pdf', 'zip' ]))
 		{
 			$base = 'bin';
 		}
 
-		$rc .= '/' . $base . '/' . ($key ? $key : 'temp') . '-' . \ICanBoogie\normalize($properties[File::TITLE]);
+		$rc = \ICanBoogie\strip_root(\ICanBoogie\REPOSITORY . 'files')
+		. '/' . $base . '/' . ($key ?: uniqid()) . '-' . \ICanBoogie\normalize($title);
 
 		#
 		# append extension
 		#
 
-		if (isset($properties['extension']))
-		{
-			$extension = $properties['extension'];
-		}
-		else
-		{
-			$previous_path = $properties['path'];
+		$extension = pathinfo($path, PATHINFO_EXTENSION) ?: 'file';
 
-			$pos = strrpos($previous_path, '.');
-
-			$extension = $pos === false ? '.file' : substr($previous_path, $pos);
-		}
-
-		$rc .= $extension;
-
-		//\ICanBoogie\log('path: \1', array($rc));
-
-		return $rc;
+		return $rc . '.' . $extension;
 	}
 }

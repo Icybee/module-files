@@ -104,10 +104,11 @@ class UploadOperation extends \ICanBoogie\Operation
 	{
 		$file = $this->file;
 
-		$filename = uniqid(null, true) . $file->extension;
-		$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . $filename;
+		$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . uniqid(null, true) . $file->extension;
 
 		$file->move($pathname);
+
+		file_put_contents($pathname . '.info', json_encode($file->to_array()));
 
 		$title = $file->unsuffixed_name;
 		$pathname = \ICanBoogie\strip_root($pathname);

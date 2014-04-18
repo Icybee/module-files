@@ -42,12 +42,7 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 			'request_params' => [
 
 				Operation::DESTINATION => 'files',
-				Operation::NAME => 'save',
-
-				'siteid' => 0,
-				'nativeid' => 0,
-				'language' => '',
-				'description' => ''
+				Operation::NAME => 'save'
 
 			],
 
@@ -97,7 +92,7 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 		$this->assertNotEmpty((string) $headers['Expires']);
 		$this->assertEquals(filesize(__FILE__), (string) $headers['Content-Length']);
 		$this->assertEquals('application/x-php', (string) $headers['Content-Type']);
-		$this->assertEquals($record->updated_at->utc->as_rfc1123, (string) $headers['Last-Modified']);
+		$this->assertEquals(filemtime(\ICanBoogie\DOCUMENT_ROOT . $record->path), $headers['Last-Modified']->timestamp);
 
 		ob_start();
 		$response->rc();
@@ -111,15 +106,16 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 		$request = Request::from([
 
 			'uri' => "/api/files/{$record->nid}",
-			'method' => 'GET'
+			'method' => 'GET',
+			'headers' => [
 
-		], [ [
+				"Cache-Control" => "max-age=0",
+				"If-Modified-Since" => $headers['Last-Modified'],
+				"If-None-Match" => $headers['Etag']
 
-			"HTTP_CACHE_CONTROL" => "max-age=0",
-			"HTTP_IF_MODIFIED_SINCE" => $headers['Last-Modified'],
-			"HTTP_IF_NONE_MATCH" => $headers['Etag']
+			]
 
-		] ]);
+		]);
 
 		$response = $request();
 
@@ -136,13 +132,13 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 		$request = Request::from([
 
 			'uri' => "/api/files/{$record->nid}",
-			'method' => 'GET'
+			'method' => 'GET',
+			'headers' => [
 
-		], [ [
+				'Cache-Control' => "no-cache"
 
-			"HTTP_CACHE_CONTROL" => "no-cache"
-
-		] ]);
+			]
+		]);
 
 		$response = $request();
 
@@ -156,7 +152,7 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 		$this->assertNotEmpty((string) $headers['Expires']);
 		$this->assertEquals(filesize(__FILE__), (string) $headers['Content-Length']);
 		$this->assertEquals('application/x-php', (string) $headers['Content-Type']);
-		$this->assertEquals($record->updated_at->utc->as_rfc1123, (string) $headers['Last-Modified']);
+		$this->assertEquals(filemtime(\ICanBoogie\DOCUMENT_ROOT . $record->path), $headers['Last-Modified']->timestamp);
 	}
 }
 
