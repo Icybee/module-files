@@ -38,3 +38,5 @@ clean:
 	@rm -fR vendor
 	@rm -f composer.lock
 	@rm -f composer.phar
+	@rm -Rf tests/repository/files
+	@rm -Rf tests/repository/tmp
