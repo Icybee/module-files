@@ -158,7 +158,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 		{
 			$error_message = $file->error_message;
 
-			$max_file_size = $core->registry["{$this->module->flat_id}.max_file_size"];
+			$max_file_size = $core->registry["{$this->module->flat_id}.max_file_size"] * 1024;
 
 			if ($max_file_size && $max_file_size < $file->size)
 			{
