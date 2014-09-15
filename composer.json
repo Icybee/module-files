@@ -23,7 +23,7 @@
 	"require": {
 		"php": ">=5.4.0",
 		"icanboogie/module-installer": "*",
-		"icanboogie/http": "2.1.x",
+		"icanboogie/http": "2.x",
 		"icybee/module-registry": "*",
 		"icybee/module-nodes": "2.x"
 	},
