@@ -11,7 +11,6 @@
 
 namespace Icybee\Modules\Files;
 
-use ICanBoogie\Exception;
 use ICanBoogie\Uploaded;
 
 class Model extends \Icybee\Modules\Nodes\Model
