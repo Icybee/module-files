@@ -12,7 +12,6 @@
 namespace Icybee\Modules\Files;
 
 use ICanBoogie\I18n;
-use ICanBoogie\Uploaded;
 
 use Brickrouge\Element;
 

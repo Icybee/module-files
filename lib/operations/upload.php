@@ -12,7 +12,6 @@
 namespace Icybee\Modules\Files;
 
 use ICanBoogie\HTTP\Request;
-use ICanBoogie\Uploaded;
 
 /**
  * Upload a file to the repository's temporary folder.

@@ -96,14 +96,16 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 		# check uploaded file
 		#
 
-		$file = new Uploaded(File::PATH, $accept);
+		/* @var $file \ICanBoogie\HTTP\File */
 
-		if ($file->location)
+		$file = $core->request->files[File::PATH];
+
+		if ($file->is_valid)
 		{
-			$values[File::TITLE] = $file->name;
+			$values[File::TITLE] = $file->unsuffixed_name;
 
-			$uploaded_mime = $file->mime;
-			$uploaded_path = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . basename($file->location) . $file->extension;
+			$uploaded_mime = $file->type;
+			$uploaded_path = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . $file->name;
 
 			$file->move($uploaded_path, true);
 

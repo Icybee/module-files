@@ -11,8 +11,6 @@
 
 namespace Icybee\Modules\Files;
 
-use ICanBoogie\Uploaded;
-
 class Module extends \Icybee\Modules\Nodes\Module
 {
 	const OPERATION_UPLOAD = 'upload';

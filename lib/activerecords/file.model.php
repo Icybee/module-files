@@ -11,8 +11,6 @@
 
 namespace Icybee\Modules\Files;
 
-use ICanBoogie\Uploaded;
-
 class Model extends \Icybee\Modules\Nodes\Model
 {
 	const ACCEPT = '#files-accept';
