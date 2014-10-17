@@ -3,15 +3,15 @@
 namespace Icybee\Modules\Files;
 
 use ICanBoogie\ActiveRecord\Model;
-use ICanBoogie\Module;
+use ICanBoogie\Module\Descriptor;
 
 return array
 (
-	Module::T_CATEGORY => 'resources',
-	Module::T_DESCRIPTION => 'Foundation for file management',
-	Module::T_EXTENDS => 'nodes',
-	Module::T_ID => 'files',
-	Module::T_MODELS => array
+	Descriptor::CATEGORY => 'resources',
+	Descriptor::DESCRIPTION => 'Foundation for file management',
+	Descriptor::INHERITS => 'nodes',
+	Descriptor::ID => 'files',
+	Descriptor::MODELS => array
 	(
 		'primary' => array
 		(
@@ -29,8 +29,8 @@ return array
 		)
 	),
 
-	Module::T_NAMESPACE => __NAMESPACE__,
-	Module::T_REQUIRED => true,
-	Module::T_TITLE => 'Files',
-	Module::T_VERSION => '1.0'
+	Descriptor::NS => __NAMESPACE__,
+	Descriptor::REQUIRED => true,
+	Descriptor::TITLE => 'Files',
+	Descriptor::VERSION => '1.0'
 );
