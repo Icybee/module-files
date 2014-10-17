@@ -23,7 +23,7 @@ $core = new \ICanBoogie\Core(\ICanBoogie\array_merge_recursive(\ICanBoogie\get_a
 
 	'config-path' => [
 
-		__DIR__ . DIRECTORY_SEPARATOR . 'config'
+		__DIR__ . DIRECTORY_SEPARATOR . 'config' => 10
 
 	],
 
@@ -35,34 +35,13 @@ $core = new \ICanBoogie\Core(\ICanBoogie\array_merge_recursive(\ICanBoogie\get_a
 
 ]));
 
-$core();
+$core->boot();
 
-#
-# Install modules
-#
-
-$errors = new \ICanBoogie\Errors();
-
-foreach (array_keys($core->modules->enabled_modules_descriptors) as $module_id)
-{
-	#
-	# The index on the `constructor` column of the `nodes` module clashes with SQLite, we don't
-	# care right now, so the exception is discarted.
-	#
-
-	try
-	{
-		$core->modules[$module_id]->install($errors);
-	}
-	catch (\Exception $e)
-	{
-		$errors[$module_id] = "Unable to install module: " . $e->getMessage();
-	}
-}
+$errors = $core->modules->install(new \ICanBoogie\Errors());
 
 if ($errors->count())
 {
-	foreach ($errors as $error)
+	foreach ($errors as $module_id => $error)
 	{
 		echo "$module_id: $error\n";
 	}
