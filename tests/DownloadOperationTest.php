@@ -81,7 +81,7 @@ class DownloadOperationTest extends \PHPUnit_Framework_TestCase
 
 		$request = Request::from([
 
-			'uri' => "/api/files/{$record->nid}/download",
+			'uri' => "/api/files/{$record->uuid}/download",
 			'method' => 'GET'
 
 		]);

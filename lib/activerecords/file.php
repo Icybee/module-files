@@ -119,9 +119,19 @@ class File extends \Icybee\Modules\Nodes\Node
 
 	public function url($type='view')
 	{
-		if ($type == 'download')
+		$routes = $this->app->routes;
+		$route_id = "api:{$this->constructor}/$type";
+
+		if (isset($routes[$route_id]))
 		{
-			return ($this->siteid ? $this->site->path : '') . '/api/' . $this->constructor . '/' . $this->nid . '/download';
+			return $routes[$route_id]->format($this);
+		}
+
+		$route_id = "api:files/$type";
+
+		if (isset($routes[$route_id]))
+		{
+			return $routes[$route_id]->format($this);
 		}
 
 		return parent::url($type);

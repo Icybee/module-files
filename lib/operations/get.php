@@ -38,6 +38,25 @@ class GetOperation extends \ICanBoogie\Operation
 		] + parent::get_controls();
 	}
 
+	protected function lazy_get_record()
+	{
+		$uuid = $this->request['uuid'];
+
+		if (!$uuid)
+		{
+			return;
+		}
+
+		$nid = $this->module->model->select('nid')->filter_by_uuid($uuid)->rc;
+
+		if (!$nid)
+		{
+			return;
+		}
+
+		return $this->module->model[$nid];
+	}
+
 	/**
 	 * Overrides the method to check the availability of the record to the requesting user.
 	 *
@@ -68,7 +87,6 @@ class GetOperation extends \ICanBoogie\Operation
 		return true;
 	}
 
-	// TODO-20090512: Implement Accept-Range
 	protected function process()
 	{
 		/* @var $record File */
@@ -90,7 +108,8 @@ class GetOperation extends \ICanBoogie\Operation
 			$if_none_match = $request->headers['If-None-Match'];
 			$if_modified_since = $request->headers['If-Modified-Since'];
 
-			if (!$if_modified_since->is_empty && $if_modified_since->timestamp >= $modified_time
+			if (!$if_modified_since->is_empty
+			&& $if_modified_since->timestamp >= $modified_time
 			&& $if_none_match == $hash)
 			{
 				$response->status = 304;

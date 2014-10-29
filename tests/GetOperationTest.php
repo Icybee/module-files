@@ -76,7 +76,7 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 
 		$request = Request::from([
 
-			'uri' => "/api/files/{$record->nid}",
+			'uri' => "/api/files/{$record->uuid}",
 			'method' => 'GET'
 
 		]);
@@ -106,7 +106,7 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 
 		$request = Request::from([
 
-			'uri' => "/api/files/{$record->nid}",
+			'uri' => "/api/files/{$record->uuid}",
 			'method' => 'GET',
 			'headers' => [
 
@@ -132,7 +132,7 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 
 		$request = Request::from([
 
-			'uri' => "/api/files/{$record->nid}",
+			'uri' => "/api/files/{$record->uuid}",
 			'method' => 'GET',
 			'headers' => [
 

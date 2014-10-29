@@ -12,19 +12,20 @@
 namespace Icybee\Modules\Files;
 
 use ICanBoogie\HTTP\Request;
-use ICanBoogie\Operation;
 
 return [
 
 	'api:files/get' => [
 
-		'pattern' => '/api/files/<nid:\d+>',
+		'pattern' => '/api/files/<uuid:[0-9a-z\-]{36}>',
 		'controller' => __NAMESPACE__ . '\GetOperation',
-		'via' => Request::METHOD_GET,
-		'param_translation_list' => [
+		'via' => Request::METHOD_GET
+	],
 
-			'nid' => Operation::KEY
+	'api:files/download' => [
 
-		]
+		'pattern' => '/api/files/<uuid:[0-9a-z\-]{36}>/download',
+		'controller' => __NAMESPACE__ . '\DownloadOperation',
+		'via' => Request::METHOD_GET
 	]
 ];
