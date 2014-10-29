@@ -112,8 +112,6 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 			}
 		}
 
-		// FIXME: now that we use a flash uploader, will the PATH defined in HIDDENS be a problem ?
-
 		$values[File::PATH] = $uploaded_path ? $uploaded_path : $entry_path;
 
 		#

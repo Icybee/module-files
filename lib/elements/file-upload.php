@@ -13,8 +13,6 @@ namespace Icybee\Modules\Files;
 
 use ICanBoogie\I18n;
 
-use Brickrouge\Element;
-
 class FileUpload extends \Brickrouge\File
 {
 	protected function infos()
