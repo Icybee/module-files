@@ -26,7 +26,5 @@ return [
 			'nid' => Operation::KEY
 
 		]
-
 	]
-
 ];

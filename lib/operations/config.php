@@ -13,4 +13,5 @@ namespace Icybee\Modules\Files;
 
 class ConfigOperation extends \Icybee\Modules\Nodes\ConfigOperation
 {
+
 }

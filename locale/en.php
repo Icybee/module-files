@@ -1,41 +1,47 @@
 <?php
 
-return array
-(
-	'files' => array
-	(
-		'count' => array
-		(
+return [
+
+	'files' => [
+
+		'count' => [
+
 			'none' => 'No files',
 			'one' => 'One file',
 			'other' => ':count files'
-		),
 
-		'name' => array
-		(
+		],
+
+		'name' => [
+
 			'one' => 'File',
 			'other' => 'Files'
-		),
 
-		'manage.column' => array
-		(
+		],
+
+		'manage.column' => [
+
 			'mime' => 'MIME type',
 			'size' => 'Size'
-		)
-	),
 
-	'fileupload.element' => array
-	(
+		]
+	],
+
+	'fileupload.element' => [
+
 		'download' => 'Download'
-	),
 
-	'label' => array
-	(
+	],
+
+	'label' => [
+
 		'description' => 'Description',
 		'file' => 'File',
 		'max_file_size' => 'Maximum size of uploaded files'
-	),
+
+	],
 
 	'module_category.resources' => 'Resources',
 	'module_title.files' => 'Files'
-);
+
+];

@@ -21,6 +21,11 @@ use Icybee\Modules\Files\UploadOperationTest\FakeSaveOperation;
 
 class UploadOperationTest extends \PHPUnit_Framework_TestCase
 {
+	/**
+	 * @var \ICanBoogie\Core
+	 */
+	static private $app;
+
 	static private $request_basic_properties = [
 
 		'is_post' => true,
@@ -30,16 +35,13 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 
 	static public function setupBeforeClass()
 	{
-		global $core;
-
-		$core->models['users'][1]->login();
+		self::$app = \ICanBoogie\app();
+		self::$app->models['users'][1]->login();
 	}
 
 	static public function tearDownAfterClass()
 	{
-		global $core;
-
-		$core->user->logout();
+		self::$app->user->logout();
 	}
 
 	/**
@@ -190,9 +192,7 @@ class FakeUploadOperation extends \Icybee\Modules\Files\UploadOperation
 {
 	public function __invoke(Request $request)
 	{
-		global $core;
-
-		$this->module = $core->modules['files'];
+		$this->module = $this->app->modules['files'];
 
 		return parent::__invoke($request);
 	}
@@ -202,9 +202,7 @@ class FakeSaveOperation extends \Icybee\Modules\Files\SaveOperation
 {
 	public function __invoke(Request $request)
 	{
-		global $core;
-
-		$this->module = $core->modules['files'];
+		$this->module = $this->app->modules['files'];
 
 		return parent::__invoke($request);
 	}

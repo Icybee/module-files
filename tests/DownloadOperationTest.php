@@ -21,15 +21,19 @@ use Icybee\Modules\Files\DownloadOperationTest\FakeSaveOperation;
 class DownloadOperationTest extends \PHPUnit_Framework_TestCase
 {
 	/**
+	 * @var \ICanBoogie\Core;
+	 */
+	static private $app;
+
+	/**
 	 * @var File
 	 */
 	static private $record;
 
 	static public function setupBeforeClass()
 	{
-		global $core;
-
-		$core->models['users'][1]->login();
+		self::$app = \ICanBoogie\app();
+		self::$app->models['users'][1]->login();
 
 		$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR. basename(__FILE__);
 
@@ -67,10 +71,7 @@ class DownloadOperationTest extends \PHPUnit_Framework_TestCase
 
 	static public function tearDownAfterClass()
 	{
-		global $core;
-
-		$core->user->logout();
-
+		self::$app->user->logout();
 		self::$record->delete();
 	}
 
@@ -101,9 +102,7 @@ class FakeSaveOperation extends \Icybee\Modules\Files\SaveOperation
 {
 	public function __invoke(Request $request)
 	{
-		global $core;
-
-		$this->module = $core->modules['files'];
+		$this->module = $this->app->modules['files'];
 
 		return parent::__invoke($request);
 	}

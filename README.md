@@ -23,17 +23,10 @@ The package requires PHP 5.4 or later.
 
 ## Installation
 
-The recommended way to install this package is through [Composer](http://getcomposer.org/).
-Create a `composer.json` file and run `php composer.phar install` command to install it:
+The recommended way to install this package is through [Composer](http://getcomposer.org/):
 
-```json
-{
-	"minimum-stability": "dev",
-	"require":
-	{
-		"icybee/module-files": "2.1.x"
-	}
-}
+```
+$ composer require icybee/module-files:~2.1
 ```
 
 Note: The module is part of the modules required by Icybee.
@@ -47,7 +40,7 @@ Note: The module is part of the modules required by Icybee.
 The package is [available on GitHub](https://github.com/Icybee/module-files), its repository can be
 cloned with the following command line:
 
-	$ git clone git://github.com/Icybee/module-files.git files
+	$ git clone https://github.com/Icybee/module-files.git
 
 
 

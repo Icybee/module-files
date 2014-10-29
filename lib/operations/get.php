@@ -16,7 +16,7 @@ use ICanBoogie\HTTP\HTTPError;
 /**
  * Get a file.
  *
- * The file transfert is handled by PHP, the location of the file is not be revealed.
+ * The file transfer is handled by PHP, the location of the file is not be revealed.
  *
  * Offline files cannot be obtained by visitors.
  *
@@ -31,12 +31,11 @@ class GetOperation extends \ICanBoogie\Operation
 	 */
 	protected function get_controls()
 	{
-		return array
-		(
-			self::CONTROL_RECORD => true
-		)
+		return [
 
-		+ parent::get_controls();
+			self::CONTROL_RECORD => true
+
+		] + parent::get_controls();
 	}
 
 	/**
@@ -47,20 +46,17 @@ class GetOperation extends \ICanBoogie\Operation
 	 */
 	protected function control_record()
 	{
-		global $core;
-
 		$record = parent::control_record();
 
-		if ($core->user->is_guest && !$record->is_online)
+		if ($this->app->user->is_guest && !$record->is_online)
 		{
 			throw new HTTPError
 			(
-				\ICanBoogie\format('The requested resource requires authentication: %resource', array
-				(
-					'%resource' => $record->constructor . '/' . $this->key
-				)),
+				\ICanBoogie\format('The requested resource requires authentication: %resource', [
 
-				401
+					'%resource' => $record->constructor . '/' . $this->key
+
+				]), 401
 			);
 		}
 

@@ -24,23 +24,18 @@ class ConfigBlock extends \Icybee\ConfigBlock
 	{
 		$ns = $this->module->flat_id;
 
-		return array_merge
-		(
-			parent::lazy_get_children(), array
-			(
-				"local[$ns.max_file_size]" => new Text
-				(
-					array
-					(
-						Form::LABEL => 'max_file_size',
-						Text::ADDON => 'Kb', // TODO-20110206: use conventions
-						Element::DEFAULT_VALUE => 16000,
+		return array_merge(parent::lazy_get_children(), [
 
-						'class' => 'measure',
-						'size' => 6
-					)
-				)
-			)
-		);
+			"local[$ns.max_file_size]" => new Text([
+
+				Form::LABEL => 'max_file_size',
+				Text::ADDON => 'Kb', // TODO-20110206: use conventions
+				Element::DEFAULT_VALUE => 16000,
+
+				'class' => 'measure',
+				'size' => 6
+
+			])
+		]);
 	}
 }

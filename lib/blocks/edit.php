@@ -40,40 +40,41 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 
 	protected function lazy_get_values()
 	{
-		return parent::lazy_get_values() + array
-		(
+		return parent::lazy_get_values() + [
+
 			File::NID => null,
 			File::PATH => null,
 			self::UPLOADED => null
-		);
+
+		];
 	}
 
 	protected function lazy_get_children()
 	{
-		global $core;
-
 		$folder = \ICanBoogie\REPOSITORY . 'tmp';
 
 		if (!is_writable($folder))
 		{
-			return array
-			(
-				Element::CHILDREN => array
-				(
-					I18n\t('The folder %folder is not writable !', array('%folder' => $folder))
-				)
-			);
+			return [
+
+				Element::CHILDREN => [
+
+					I18n\t('The folder %folder is not writable !', [ '%folder' => $folder ])
+
+				]
+			];
 		}
 
 		#
 		# options
 		#
 
-		$options = array
-		(
+		$options = [
+
 			self::ACCEPT => $this->accept,
 			self::UPLOADER_CLASS => $this->uploader_class
-		);
+
+		];
 
 		$accept = $options[self::ACCEPT];
 		$uploader_class = $options[self::UPLOADER_CLASS];
@@ -83,7 +84,7 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 		# and is available on our host
 		#
 
-		$values = array();
+		$values = [];
 		$properties = $this->values;
 
 		$entry_nid = $properties[File::NID];
@@ -98,7 +99,7 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 
 		/* @var $file \ICanBoogie\HTTP\File */
 
-		$file = $core->request->files[File::PATH];
+		$file = $this->app->request->files[File::PATH];
 
 		if ($file->is_valid)
 		{
@@ -123,21 +124,20 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 		# elements
 		#
 
-		$this->attributes = \ICanBoogie\array_merge_recursive
-		(
-			$this->attributes, array
-			(
-				Form::HIDDENS => array
-				(
-					File::PATH => $uploaded_path,
-					File::MIME => $uploaded_mime,
+		$this->attributes = \ICanBoogie\array_merge_recursive($this->attributes, [
 
-					self::UPLOADED => $uploaded_path
-				),
+			Form::HIDDENS => [
 
-				Form::VALUES => $values
-			)
-		);
+				File::PATH => $uploaded_path,
+				File::MIME => $uploaded_mime,
+
+				self::UPLOADED => $uploaded_path
+
+			],
+
+			Form::VALUES => $values
+
+		]);
 
 		return array_merge(parent::lazy_get_children(), [
 
@@ -145,22 +145,20 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 
 				Form::LABEL => 'file',
 				Element::REQUIRED => empty($entry_nid),
-				\Brickrouge\File::FILE_WITH_LIMIT => $core->site->metas[$this->module->flat_id . '.max_file_size'],
+				\Brickrouge\File::FILE_WITH_LIMIT => $this->app->site->metas[$this->module->flat_id . '.max_file_size'],
 				Element::WEIGHT => -100,
 				\Brickrouge\File::T_UPLOAD_URL => Operation::encode($this->module->id . '/upload')
 
 			]),
 
-			File::DESCRIPTION => new RTEEditorElement
-			(
-				array
-				(
-					Form::LABEL => 'description',
-					Element::WEIGHT => 50,
+			File::DESCRIPTION => $this->app->editors['rte']->from([
 
-					'rows' => 5
-				)
-			)
+				Form::LABEL => 'description',
+				Element::WEIGHT => 50,
+
+				'rows' => 5
+
+			])
 		]);
 	}
 }

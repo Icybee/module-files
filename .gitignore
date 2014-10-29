@@ -3,7 +3,6 @@
 .settings
 .README.md.html
 composer.lock
-composer.phar
 docs
 tests/repository
 vendor

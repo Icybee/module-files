@@ -16,7 +16,7 @@ class Model extends \Icybee\Modules\Nodes\Model
 	const ACCEPT = '#files-accept';
 	const UPLOADED = '#files-uploaded';
 
-	public function save(array $properties, $key=null, array $options=array())
+	public function save(array $properties, $key=null, array $options=[])
 	{
 		#
 		# because the newly uploaded file might not overrite the previous file if there extensions
@@ -31,7 +31,7 @@ class Model extends \Icybee\Modules\Nodes\Model
 		# It is set to the last value of the entry, or NULL if we are creating a
 		# new one.
 		#
-		# If nedded, the file is renamed after the entry has been saved.
+		# If needed, the file is renamed after the entry has been saved.
 		#
 
 		$previous_title = null;

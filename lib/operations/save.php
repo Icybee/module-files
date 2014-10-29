@@ -45,7 +45,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 
 	/**
 	 * Unset the `mime` and `size` properties because they cannot be updated by the user. If the
-	 * `file` property is defined, which is the case when an asynchronous upload happend, it is
+	 * `file` property is defined, which is the case when an asynchronous upload happened, it is
 	 * copied to the `path` property.
 	 */
 	protected function lazy_get_properties()
@@ -94,13 +94,11 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 	 * an entry - the PATH parameter of the operation is set to TRUE to avoid error reporting from
 	 * the form validation.
 	 *
-	 * TODO: maybe this is not ideal, since the file upload should be made optionnal when the form
+	 * TODO: maybe this is not ideal, since the file upload should be made optional when the form
 	 * is generated to edit existing entries.
 	 */
 	protected function control(array $controls)
 	{
-		global $core;
-
 		$request = $this->request;
 
 		$path = $request[File::PATH];
@@ -150,15 +148,13 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 	 */
 	protected function validate(\ICanboogie\Errors $errors)
 	{
-		global $core;
-
 		$file = $this->file;
 
 		if ($file)
 		{
 			$error_message = $file->error_message;
 
-			$max_file_size = $core->registry["{$this->module->flat_id}.max_file_size"] * 1024;
+			$max_file_size = $this->app->registry["{$this->module->flat_id}.max_file_size"] * 1024;
 
 			if ($max_file_size && $max_file_size < $file->size)
 			{

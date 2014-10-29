@@ -25,13 +25,11 @@ class ManageBlock extends \Icybee\Modules\Nodes\ManageBlock
 
 	public function __construct(Module $module, array $attributes)
 	{
-		parent::__construct
-		(
-			$module, $attributes + array
-			(
-				self::T_COLUMNS_ORDER => array('title', 'size', 'download', 'is_online', 'uid', 'mime', 'updated_at')
-			)
-		);
+		parent::__construct($module, $attributes + [
+
+			self::T_COLUMNS_ORDER => [ 'title', 'size', 'download', 'is_online', 'uid', 'mime', 'updated_at' ]
+
+		]);
 	}
 
 	/**
@@ -45,12 +43,13 @@ class ManageBlock extends \Icybee\Modules\Nodes\ManageBlock
 	 */
 	protected function get_available_columns()
 	{
-		return array_merge(parent::get_available_columns(), array
-		(
+		return array_merge(parent::get_available_columns(), [
+
 			File::MIME => __CLASS__ . '\MimeColumn',
 			File::SIZE => __CLASS__ . '\SizeColumn',
 			'download' => __CLASS__ . '\DownloadColumn'
-		));
+
+		]);
 	}
 }
 
@@ -79,24 +78,22 @@ class MimeColumn extends Column
  */
 class SizeColumn extends \Icybee\ManageBlock\SizeColumn
 {
-	public function __construct(\Icybee\ManageBlock $manager, $id, array $options=array())
+	public function __construct(\Icybee\ManageBlock $manager, $id, array $options=[])
 	{
-		parent::__construct
-		(
-			$manager, $id, $options + array
-			(
-				'class' => 'cell-fitted pull-right',
-				'filters' => array
-				(
-					'options' => array
-					(
-						'=l' => 'Large',
-						'=m' => 'Medium',
-						'=s' => 'Small'
-					)
-				)
-			)
-		);
+		parent::__construct($manager, $id, $options + [
+
+			'class' => 'cell-fitted pull-right',
+			'filters' => [
+
+				'options' => [
+
+					'=l' => 'Large',
+					'=m' => 'Medium',
+					'=s' => 'Small'
+
+				]
+			]
+		]);
 	}
 
 	/**
@@ -110,7 +107,7 @@ class SizeColumn extends \Icybee\ManageBlock\SizeColumn
 		{
 			$value = $modifiers['size'];
 
-			if (in_array($value, array('l', 'm', 's')))
+			if (in_array($value, [ 'l', 'm', 's' ]))
 			{
 				$filters['size'] = $value;
 			}
@@ -132,14 +129,15 @@ class SizeColumn extends \Icybee\ManageBlock\SizeColumn
 		{
 			list($avg, $max, $min) = $query->model->similar_site->select('AVG(size), MAX(size), MIN(size)')->one(\PDO::FETCH_NUM);
 
-			$bounds = array
-			(
+			$bounds = [
+
 				$min,
 				round($avg - ($avg - $min) / 3),
 				round($avg),
 				round($avg + ($max - $avg) / 3),
 				$max
-			);
+
+			];
 
 			switch ($filter_value)
 			{
@@ -158,27 +156,23 @@ class SizeColumn extends \Icybee\ManageBlock\SizeColumn
  */
 class DownloadColumn extends \Icybee\ManageBlock\Column
 {
-	public function __construct(\Icybee\ManageBlock $manager, $id, array $options=array())
+	public function __construct(\Icybee\ManageBlock $manager, $id, array $options=[])
 	{
-		parent::__construct
-		(
-			$manager, $id, array
-			(
-				'orderable' => false,
-				'title' => null
-			)
-		);
+		parent::__construct($manager, $id, [
+
+			'orderable' => false,
+			'title' => null
+
+		]);
 	}
 
 	public function render_cell($record)
 	{
-		return new A
-		(
-			'', $record->url('download'), array
-			(
-				'class' => 'download',
-				'title' => $this->manager->t('Download file')
-			)
-		);
+		return new A('', $record->url('download'), [
+
+			'class' => 'download',
+			'title' => $this->manager->t('Download file')
+
+		]);
 	}
 }

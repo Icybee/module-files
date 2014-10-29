@@ -14,7 +14,7 @@ namespace Icybee\Modules\Files;
 /**
  * Downloads a file.
  *
- * The file transfert is handled by PHP, the location of the file is not be revealed.
+ * The file transfer is handled by PHP, the location of the file is not be revealed.
  *
  * Offline files cannot be downloaded by visitors.
  */

@@ -11,6 +11,11 @@
 
 $_SERVER['DOCUMENT_ROOT'] = __DIR__;
 
+if (!file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'repository'))
+{
+	mkdir(__DIR__ . DIRECTORY_SEPARATOR . 'repository');
+}
+
 require __DIR__ . '/../vendor/autoload.php';
 
 #

@@ -60,8 +60,6 @@ class UploadOperation extends \ICanBoogie\Operation
 	 */
 	protected function validate(\ICanboogie\Errors $errors)
 	{
-		global $core;
-
 		#
 		# forces 'application/json' response type
 		#
@@ -79,7 +77,7 @@ class UploadOperation extends \ICanBoogie\Operation
 
 		$error_message = $file->error_message;
 
-		$max_file_size = $core->registry["{$this->module->flat_id}.max_file_size"] * 1024;
+		$max_file_size = $this->app->registry["{$this->module->flat_id}.max_file_size"] * 1024;
 
 		if ($max_file_size && $max_file_size < $file->size)
 		{

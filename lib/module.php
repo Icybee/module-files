@@ -17,13 +17,11 @@ class Module extends \Icybee\Modules\Nodes\Module
 
 	/**
 	 * Overrides the method to create the "/repository/tmp/" and "/repository/files/" directories,
-	 * and add a ".htaccess" file in the "/repository/tmp/" direcotry which denies all access and
+	 * and add a ".htaccess" file in the "/repository/tmp/" directory which denies all access and
 	 * a ".htaccess" file in the "/repository/files/" directory which allows all access.
 	 */
 	public function install(\ICanBoogie\Errors $errors)
 	{
-		global $core;
-
 		$repository = \ICanBoogie\REPOSITORY;
 
 		#
@@ -74,7 +72,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 		# config: max_file_size
 		#
 
-		$core->registry["{$this->flat_id}.max_file_size"] = 16000;
+		$this->app->registry["{$this->flat_id}.max_file_size"] = 16000;
 
 		return parent::install($errors);
 	}
@@ -84,8 +82,6 @@ class Module extends \Icybee\Modules\Nodes\Module
 	 */
 	public function is_installed(\ICanBoogie\Errors $errors)
 	{
-		global $core;
-
 		$repository = \ICanBoogie\REPOSITORY;
 
 		#
@@ -126,7 +122,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 
 		if (!is_writable($path))
 		{
-			\ICanBoogie\log_error('The directory %directory is not writtable', [ '%directory' => $path ]);
+			\ICanBoogie\log_error('The directory %directory is not writable', [ '%directory' => $path ]);
 
 			return;
 		}
