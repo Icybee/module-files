@@ -20,6 +20,7 @@ return [
 		'pattern' => '/api/files/<uuid:[0-9a-z\-]{36}>',
 		'controller' => __NAMESPACE__ . '\GetOperation',
 		'via' => Request::METHOD_GET
+
 	],
 
 	'api:files/download' => [
@@ -27,5 +28,22 @@ return [
 		'pattern' => '/api/files/<uuid:[0-9a-z\-]{36}>/download',
 		'controller' => __NAMESPACE__ . '\DownloadOperation',
 		'via' => Request::METHOD_GET
+
+	],
+
+	'files/get' => [
+
+		'pattern' => '/files/<uuid:[0-9a-z\-]{36}>',
+		'controller' => __NAMESPACE__ . '\GetController',
+		'via' => Request::METHOD_GET
+
+	],
+
+	'files/download' => [
+
+		'pattern' => '/files/<uuid:[0-9a-z\-]{36}>/download',
+		'controller' => __NAMESPACE__ . '\DownloadController',
+		'via' => Request::METHOD_GET
+
 	]
 ];

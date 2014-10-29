@@ -120,14 +120,14 @@ class File extends \Icybee\Modules\Nodes\Node
 	public function url($type='view')
 	{
 		$routes = $this->app->routes;
-		$route_id = "api:{$this->constructor}/$type";
+		$route_id = "{$this->constructor}/$type";
 
 		if (isset($routes[$route_id]))
 		{
 			return $routes[$route_id]->format($this);
 		}
 
-		$route_id = "api:files/$type";
+		$route_id = "files/$type";
 
 		if (isset($routes[$route_id]))
 		{
