@@ -49,6 +49,6 @@ class FileUpload extends \Brickrouge\File
 
 	protected function preview($path)
 	{
-		return '<a class="icon-download-alt" href="' . $path . '" title="' . I18n\t('download', [], [ 'scope' => 'fileupload.element' ])) . '"></a>';
+		return '<a class="icon-download-alt" href="' . $path . '" title="' . I18n\t('download', [], [ 'scope' => 'fileupload.element' ]) . '"></a>';
 	}
 }
