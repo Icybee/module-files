@@ -44,9 +44,12 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 	protected $accept;
 
 	/**
-	 * Unset the `mime` and `size` properties because they cannot be updated by the user. If the
-	 * `file` property is defined, which is the case when an asynchronous upload happened, it is
-	 * copied to the `path` property.
+	 * {@inheritdoc}
+	 *
+	 * Unset {@link File::PATH} because only {@link File::HTTP_FILE} can be used to update it.
+	 * {@link File::HTTP_FILE} is updated if {@link $file} is not empty.
+	 *
+	 * Also, {@link File::DESCRIPTION} is set to and empty string if it is not defined.
 	 */
 	protected function lazy_get_properties()
 	{
@@ -56,16 +59,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 
 		];
 
-		#
-		# File:PATH is set to true when the file is not mandatory and there is no uploaded file in
-		# order for the form still validates, in which case the property must be unset, otherwise
-		# the boolean is used a the new path.
-		#
-
-		if (isset($properties[File::PATH]) && $properties[File::PATH] === true)
-		{
-			unset($properties[File::PATH]);
-		}
+		unset($properties[File::PATH]);
 
 		if ($this->file)
 		{
@@ -76,6 +70,8 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 	}
 
 	/**
+	 * {@inheritdoc}
+	 *
 	 * The temporary files stored in the repository are cleaned before the operation is processed.
 	 */
 	public function __invoke(Request $request)
@@ -137,7 +133,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 			# This is used during form validation.
 			#
 
-			$request[File::PATH] = true;
+			$request[File::PATH] = $file->pathname;
 		}
 
 		return parent::control($controls);
