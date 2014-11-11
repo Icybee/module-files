@@ -15,7 +15,6 @@ use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
 
 use Icybee\Modules\Files\UploadOperationTest\FakeUploadOperation;
-use Icybee\Modules\Files\UploadOperationTest\FakeSaveOperation;
 
 /* @var $response \ICanBoogie\Operation\Response */
 
@@ -195,24 +194,5 @@ class FakeUploadOperation extends \Icybee\Modules\Files\UploadOperation
 		$this->module = $this->app->modules['files'];
 
 		return parent::__invoke($request);
-	}
-}
-
-class FakeSaveOperation extends \Icybee\Modules\Files\SaveOperation
-{
-	public function __invoke(Request $request)
-	{
-		$this->module = $this->app->modules['files'];
-
-		return parent::__invoke($request);
-	}
-
-	protected function get_controls()
-	{
-		return [
-
-			self::CONTROL_FORM => false
-
-		] + parent::get_controls();
 	}
 }

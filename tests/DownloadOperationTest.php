@@ -12,9 +12,6 @@
 namespace Icybee\Modules\Files;
 
 use ICanBoogie\HTTP\Request;
-use ICanBoogie\Operation;
-
-use Icybee\Modules\Files\DownloadOperationTest\FakeSaveOperation;
 
 /* @var $response \ICanBoogie\Operation\Response */
 
@@ -33,40 +30,11 @@ class DownloadOperationTest extends \PHPUnit_Framework_TestCase
 	static public function setupBeforeClass()
 	{
 		self::$app = \ICanBoogie\app();
-		self::$app->models['users'][1]->login();
+		self::$record = create_file(__FILE__, [
 
-		$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR. basename(__FILE__);
-
-		copy(__FILE__, $pathname);
-
-		$request = Request::from([
-
-			'is_post' => true,
-
-			'request_params' => [
-
-				Operation::DESTINATION => 'files',
-				Operation::NAME => 'save',
-
-				'siteid' => 0,
-				'nativeid' => 0,
-				'language' => '',
-				'description' => ''
-
-			],
-
-			'files' => [
-
-				SaveOperation::USERFILE => [ 'pathname' => $pathname ]
-
-			]
+			'is_online' => true
 
 		]);
-
-		$operation = new FakeSaveOperation;
-		$response = $operation($request);
-
-		self::$record = $operation->record;
 	}
 
 	static public function tearDownAfterClass()
@@ -91,28 +59,5 @@ class DownloadOperationTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals("File Transfer", (string) $response->headers['Content-Description']);
 		$this->assertEquals("attachment; filename=" . $record->title . $record->extension, (string) $response->headers['Content-Disposition']);
 		$this->assertEquals("binary", (string) $response->headers['Content-Transfer-Encoding']);
-	}
-}
-
-namespace Icybee\Modules\Files\DownloadOperationTest;
-
-use ICanBoogie\HTTP\Request;
-
-class FakeSaveOperation extends \Icybee\Modules\Files\SaveOperation
-{
-	public function __invoke(Request $request)
-	{
-		$this->module = $this->app->modules['files'];
-
-		return parent::__invoke($request);
-	}
-
-	protected function get_controls()
-	{
-		return [
-
-			self::CONTROL_FORM => false
-
-		] + parent::get_controls();
 	}
 }

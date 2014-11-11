@@ -14,7 +14,7 @@ namespace Icybee\Modules\Files;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
 
-use Icybee\Modules\Files\SaveOperationTest\FakeSaveOperation;
+// use Icybee\Modules\Files\SaveOperationTest\FakeSaveOperation;
 
 /* @var $response \ICanBoogie\Operation\Response */
 
@@ -176,28 +176,5 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 
 		$record->delete();
 		$this->assertFileNotExists(dirname(\ICanBoogie\REPOSITORY) . $record->path);
-	}
-}
-
-namespace Icybee\Modules\Files\SaveOperationTest;
-
-use ICanBoogie\HTTP\Request;
-
-class FakeSaveOperation extends \Icybee\Modules\Files\SaveOperation
-{
-	public function __invoke(Request $request)
-	{
-		$this->module = $this->app->modules['files'];
-
-		return parent::__invoke($request);
-	}
-
-	protected function get_controls()
-	{
-		return [
-
-			self::CONTROL_FORM => false
-
-		] + parent::get_controls();
 	}
 }

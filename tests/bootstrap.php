@@ -9,6 +9,13 @@
  * file that was distributed with this source code.
  */
 
+namespace Icybee\Modules\Files;
+
+use ICanBoogie\HTTP\Request;
+use ICanBoogie\Operation;
+
+use Icybee\Modules\Users\User;
+
 $_SERVER['DOCUMENT_ROOT'] = __DIR__;
 
 if (!file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'repository'))
@@ -17,6 +24,74 @@ if (!file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'repository'))
 }
 
 require __DIR__ . '/../vendor/autoload.php';
+
+/**
+ * A save operation that doesn't require form validation.
+ */
+class FakeSaveOperation extends SaveOperation
+{
+	public function __invoke(Request $request)
+	{
+		$this->module = $this->app->modules['files'];
+
+		return parent::__invoke($request);
+	}
+
+	protected function get_controls()
+	{
+		return [
+
+			self::CONTROL_FORM => false
+
+		] + parent::get_controls();
+	}
+}
+
+/**
+ * Create a new file record.
+ *
+ * @param string $src Absolute path to the source file.
+ * @param array $attributes Additional record attributes.
+ *
+ * @return File
+ */
+function create_file($src, array $attributes=[])
+{
+	global $core;
+
+	$user = $core->models['users'][1];
+	$user->login();
+
+	$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR. basename($src);
+
+	copy($src, $pathname);
+
+	$request = Request::from([
+
+		'is_post' => true,
+
+		'request_params' => [
+
+			Operation::DESTINATION => 'files',
+			Operation::NAME => 'save'
+
+		] + $attributes,
+
+		'files' => [
+
+			SaveOperation::USERFILE => [ 'pathname' => $pathname ]
+
+		]
+
+	]);
+
+	$operation = new FakeSaveOperation;
+	$response = $operation($request);
+
+	$user->logout();
+
+	return $operation->record;
+}
 
 #
 # Create the _core_ instance used for the tests.
@@ -57,8 +132,6 @@ if ($errors->count())
 #
 #
 #
-
-use Icybee\Modules\Users\User;
 
 $user = User::from([
 
