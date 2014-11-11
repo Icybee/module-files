@@ -67,7 +67,7 @@ class GetOperation extends \ICanBoogie\Operation
 	{
 		$record = parent::control_record();
 
-		if ($this->app->user->is_guest && !$record->is_online)
+		if ($record && $this->app->user->is_guest && !$record->is_online)
 		{
 			throw new HTTPError
 			(
