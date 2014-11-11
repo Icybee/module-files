@@ -26,14 +26,21 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 	static private $app;
 
 	/**
+	 * @var \Icybee\Modules\Users\User
+	 */
+	static private $user;
+
+	/**
 	 * @var File
 	 */
 	static private $record;
 
 	static public function setupBeforeClass()
 	{
-		self::$app = \ICanBoogie\app();
-		self::$app->models['users'][1]->login();
+		self::$app = $app = \ICanBoogie\app();
+		self::$user = $user = $app->models['users'][1];
+
+		$user->login();
 
 		$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR. basename(__FILE__);
 
@@ -46,7 +53,9 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 			'request_params' => [
 
 				Operation::DESTINATION => 'files',
-				Operation::NAME => 'save'
+				Operation::NAME => 'save',
+
+				'is_online' => true
 
 			],
 
@@ -62,11 +71,12 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 		$response = $operation($request);
 
 		self::$record = $operation->record;
+
+		$user->logout();
 	}
 
 	static public function tearDownAfterClass()
 	{
-		self::$app->user->logout();
 		self::$record->delete();
 	}
 
@@ -154,6 +164,19 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals(filesize(__FILE__), (string) $headers['Content-Length']);
 		$this->assertEquals('application/x-php', (string) $headers['Content-Type']);
 		$this->assertEquals(filemtime(\ICanBoogie\DOCUMENT_ROOT . $record->path), $headers['Last-Modified']->timestamp);
+	}
+
+	/**
+	 * @expectedException ICanBoogie\HTTP\HTTPError
+	 */
+	public function test_get_offline()
+	{
+		$record = self::$record;
+		$record->is_online = false;
+		$record->save();
+
+		$request = Request::from("/api/files/{$record->uuid}");
+		$response = $request();
 	}
 }
 
