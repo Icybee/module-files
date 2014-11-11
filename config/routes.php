@@ -31,6 +31,22 @@ return [
 
 	],
 
+	'api:files/compat-get' => [
+
+		'pattern' => '/api/files/<nid:\d+>',
+		'controller' => __NAMESPACE__ . '\CompatGetOperation',
+		'via' => Request::METHOD_GET
+
+	],
+
+	'api:files/compat-download' => [
+
+		'pattern' => '/api/files/<nid:\d+>/download',
+		'controller' => __NAMESPACE__ . '\CompatDownloadOperation',
+		'via' => Request::METHOD_GET
+
+	],
+
 	'files/get' => [
 
 		'pattern' => '/files/<uuid:[0-9a-z\-]{36}>',
