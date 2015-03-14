@@ -57,9 +57,9 @@ class FakeSaveOperation extends SaveOperation
  */
 function create_file($src, array $attributes=[])
 {
-	global $core;
+	$app = \ICanBoogie\app();
 
-	$user = $core->models['users'][1];
+	$user = $app->models['users'][1];
 	$user->login();
 
 	$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR. basename($src);
@@ -97,9 +97,7 @@ function create_file($src, array $attributes=[])
 # Create the _core_ instance used for the tests.
 #
 
-global $core;
-
-$core = new \ICanBoogie\Core(\ICanBoogie\array_merge_recursive(\ICanBoogie\get_autoconfig(), [
+$app = new \ICanBoogie\Core(\ICanBoogie\array_merge_recursive(\ICanBoogie\get_autoconfig(), [
 
 	'config-path' => [
 
@@ -115,9 +113,9 @@ $core = new \ICanBoogie\Core(\ICanBoogie\array_merge_recursive(\ICanBoogie\get_a
 
 ]));
 
-$core->boot();
+$app->boot();
 
-$errors = $core->modules->install(new \ICanBoogie\Errors());
+$errors = $app->modules->install(new \ICanBoogie\Errors());
 
 if ($errors->count())
 {
@@ -140,6 +138,6 @@ $user = User::from([
 
 ]);
 
-$core->site_id = 0;
+$app->site_id = 0;
 
 $user->save();
