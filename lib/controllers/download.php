@@ -13,15 +13,19 @@ namespace Icybee\Modules\Files;
 
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Routing\Controller;
+use ICanBoogie\Routing\Routes;
 
+/**
+ * Download controller.
+ *
+ * @property Routes $routes
+ */
 class DownloadController extends Controller
 {
-	public function __invoke(Request $request)
+	protected function respond(Request $request)
 	{
-		$uuid = $request['uuid'];
-		$route = \ICanBoogie\app()->routes['api:files/download']->format([ 'uuid' => $uuid ]);
-		$request = Request::from($route);
+		$route = $this->routes['api:files/download']->format([ 'uuid' => $request['uuid'] ]);
 
-		return $request();
+		return Request::from($route)->send();
 	}
 }
