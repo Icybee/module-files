@@ -16,7 +16,7 @@ class Model extends \Icybee\Modules\Nodes\Model
 	const ACCEPT = '#files-accept';
 	const UPLOADED = '#files-uploaded';
 
-	public function save(array $properties, $key=null, array $options=[])
+	public function save(array $properties, $key = null, array $options = [])
 	{
 		#
 		# because the newly uploaded file might not overrite the previous file if there extensions

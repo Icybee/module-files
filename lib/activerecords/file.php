@@ -19,6 +19,8 @@ namespace Icybee\Modules\Files;
  */
 class File extends \Icybee\Modules\Nodes\Node
 {
+	const MODEL_ID = 'files';
+
 	const PATH = 'path';
 	const MIME = 'mime';
 	const SIZE = 'size';
@@ -52,14 +54,6 @@ class File extends \Icybee\Modules\Nodes\Node
 	 * @var string
 	 */
 	public $description = '';
-
-	/**
-	 * Defaults the model to "files".
-	 */
-	public function __construct($model='files')
-	{
-		parent::__construct($model);
-	}
 
 	/**
 	 * If {@link HTTP_FILE} is defined, the {@link \ICanBoogie\HTTP\File} instance is used to
