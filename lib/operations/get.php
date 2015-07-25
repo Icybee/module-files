@@ -11,8 +11,6 @@
 
 namespace Icybee\Modules\Files;
 
-use ICanBoogie\HTTP\HTTPError;
-
 /**
  * Get a file.
  *
@@ -69,7 +67,7 @@ class GetOperation extends \ICanBoogie\Operation
 
 		if ($record && $this->app->user->is_guest && !$record->is_online)
 		{
-			throw new HTTPError
+			throw new \Exception
 			(
 				\ICanBoogie\format('The requested resource requires authentication: %resource', [
 
@@ -130,7 +128,7 @@ class GetOperation extends \ICanBoogie\Operation
 
 		if (!$fh)
 		{
-			throw new HTTPError("Unable to lock file.");
+			throw new \Exception("Unable to lock file.");
 		}
 
 		return function() use ($fh)

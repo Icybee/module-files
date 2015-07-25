@@ -11,13 +11,15 @@
 
 namespace Icybee\Modules\Files;
 
+use Icybee\Modules\Nodes\Node;
+
 /**
  * Representation of a managed file.
  *
  * @property-read string $extension The file extension. If any, the extension includes the dot,
  * e.g. ".zip".
  */
-class File extends \Icybee\Modules\Nodes\Node
+class File extends Node
 {
 	const MODEL_ID = 'files';
 

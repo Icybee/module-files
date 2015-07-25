@@ -18,17 +18,20 @@
 		"source": "https://github.com/Icybee/module-files"
 	},
 
+	"minimum-stability": "dev",
+
 	"require": {
-		"php": ">=5.4.0",
-		"icanboogie/module-installer": "~1.2",
-		"icanboogie/http": "~2.2",
-		"icybee/module-registry": "~2.0",
-		"icybee/module-nodes": "~2.0"
+		"php": ">=5.5.0",
+		"icanboogie/module-installer": "^1.2.3",
+		"icybee/module-registry": "^2.1.0",
+		"icybee/module-nodes": "^2.1.0"
 	},
 
 	"require-dev": {
-		"icanboogie/icanboogie": "~2.0",
-		"icanboogie/i18n": "~2.0"
+		"icanboogie/icanboogie": "^2.4.0",
+		"icanboogie/bind-activerecord": "^0.3.0",
+		"icanboogie/bind-cldr": "^0.3.0",
+		"icanboogie/i18n": "^2.0.8"
 	},
 
 	"autoload": {
@@ -36,6 +39,6 @@
 	},
 
 	"scripts": {
-		"post-autoload-dump": "ICanBoogie\\AutoConfig\\Hooks::on_autoload_dump"
+		"post-autoload-dump": "ICanBoogie\\Autoconfig\\Hooks::on_autoload_dump"
 	}
 }

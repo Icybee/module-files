@@ -18,21 +18,17 @@ return [
 			Model::EXTENDING => 'nodes',
 			Model::SCHEMA => [
 
-				'fields' => [
+				'path' => 'varchar',
+				'mime' => 'varchar',
+				'size' => [ 'integer', 'unsigned' => true ],
+				'description' => 'text'
 
-					'path' => 'varchar',
-					'mime' => 'varchar',
-					'size' => [ 'integer', 'unsigned' => true ],
-					'description' => 'text'
-
-				]
 			]
 		]
 	],
 
 	Descriptor::NS => __NAMESPACE__,
 	Descriptor::REQUIRED => true,
-	Descriptor::TITLE => 'Files',
-	Descriptor::VERSION => '1.0'
+	Descriptor::TITLE => "Files"
 
 ];

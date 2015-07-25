@@ -47,6 +47,8 @@ class FileTest extends \PHPUnit_Framework_TestCase
 		copy(__FILE__, $pathname);
 		$size = filesize($pathname);
 
+		/* @var $record File */
+
 		$record = File::from([
 
 			File::HTTP_FILE => \ICanBoogie\HTTP\File::from([ 'pathname' => $pathname ])

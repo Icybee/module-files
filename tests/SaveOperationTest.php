@@ -140,7 +140,7 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 		$operation = new FakeSaveOperation;
 		$response = $operation($request);
 
-		$this->assertTrue($response->is_successful);
+		$this->assertTrue($response->status->is_successful);
 		$this->assertInstanceOf('ICanBoogie\HTTP\File', $operation->file);
 
 		/* @var $record File */
@@ -169,7 +169,7 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 		$operation = new FakeSaveOperation;
 		$response = $operation($request);
 
-		$this->assertTrue($response->is_successful);
+		$this->assertTrue($response->status->is_successful);
 		$this->assertEquals($path, $record->path);
 
 		# cleanup

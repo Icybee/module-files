@@ -112,7 +112,7 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 		$operation = new FakeUploadOperation;
 		$response = $operation($request);
 
-		$this->assertTrue($response->is_successful);
+		$this->assertTrue($response->status->is_successful);
 		$this->assertInstanceOf('ICanBoogie\HTTP\File', $operation->file);
 
 		$rc = $response->rc;
@@ -171,7 +171,7 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 		$operation = new FakeSaveOperation;
 		$response = $operation($request);
 
-		$this->assertTrue($response->is_successful);
+		$this->assertTrue($response->status->is_successful);
 
 		$record = $operation->record;
 		$file = $operation->file;

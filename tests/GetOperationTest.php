@@ -64,7 +64,7 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 
 		$response = $request();
 
-		$this->assertTrue($response->is_successful);
+		$this->assertTrue($response->status->is_successful);
 		$this->assertInstanceOf('Closure', $response->rc);
 
 		$headers = $response->headers;
@@ -77,7 +77,11 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals(filemtime(\ICanBoogie\DOCUMENT_ROOT . $record->path), $headers['Last-Modified']->timestamp);
 
 		ob_start();
-		$response->rc();
+
+		$rc = $response->rc;
+
+		$this->assertInstanceOf(\Closure::class, $rc);
+		$rc();
 		$body = ob_get_clean();
 		$this->assertSame(file_get_contents(__FILE__), $body);
 
@@ -101,7 +105,7 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 
 		$response = $request();
 
-		$this->assertEquals(304, $response->status);
+		$this->assertEquals(304, $response->status->code);
 		$this->assertTrue($response->rc);
 		$this->assertEquals('public, max-age=' . GetOperation::CACHE_MAX_AGE, (string) $response->cache_control);
 		$this->assertEquals((string) $headers['Etag'], (string) $response->headers['Etag']);
@@ -124,7 +128,7 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 
 		$response = $request();
 
-		$this->assertEquals(200, $response->status);
+		$this->assertEquals(200, $response->status->code);
 		$this->assertInstanceOf('Closure', $response->rc);
 
 		$headers = $response->headers;
@@ -138,7 +142,7 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException ICanBoogie\HTTP\HTTPError
+	 * @expectedException \Exception
 	 */
 	public function test_get_offline()
 	{

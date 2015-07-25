@@ -42,7 +42,7 @@ class CompatGetOperationTest extends \PHPUnit_Framework_TestCase
 		$request = Request::from("/api/files/{$record->nid}");
 		$response = $request();
 
-		$this->assertTrue($response->is_successful);
+		$this->assertTrue($response->status->is_successful);
 		$this->assertEquals(filesize(__FILE__), $response->content_length);
 		$this->assertEmpty((string) $response->headers['Content-Disposition']);
 	}
