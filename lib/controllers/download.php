@@ -11,18 +11,20 @@
 
 namespace Icybee\Modules\Files;
 
+use ICanBoogie\Binding\Routing\ControllerBindings;
+use ICanBoogie\Binding\Routing\ForwardUndefinedPropertiesToApplication;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Routing\Controller;
-use ICanBoogie\Routing\Routes;
 
 /**
  * Download controller.
- *
- * @property Routes $routes
  */
 class DownloadController extends Controller
 {
-	protected function respond(Request $request)
+	use ControllerBindings;
+	use ForwardUndefinedPropertiesToApplication;
+
+	protected function action(Request $request)
 	{
 		$route = $this->routes['api:files/download']->format([ 'uuid' => $request['uuid'] ]);
 

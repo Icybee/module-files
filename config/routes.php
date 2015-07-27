@@ -13,12 +13,14 @@ namespace Icybee\Modules\Files;
 
 use ICanBoogie\HTTP\Request;
 
+use Icybee\Routing\RouteMaker as Make;
+
 return [
 
 	'api:files/get' => [
 
 		'pattern' => '/api/files/<uuid:[0-9a-z\-]{36}>',
-		'controller' => __NAMESPACE__ . '\GetOperation',
+		'controller' => GetOperation::class,
 		'via' => Request::METHOD_GET
 
 	],
@@ -26,7 +28,7 @@ return [
 	'api:files/download' => [
 
 		'pattern' => '/api/files/<uuid:[0-9a-z\-]{36}>/download',
-		'controller' => __NAMESPACE__ . '\DownloadOperation',
+		'controller' => DownloadOperation::class,
 		'via' => Request::METHOD_GET
 
 	],
@@ -34,7 +36,7 @@ return [
 	'api:files/compat-get' => [
 
 		'pattern' => '/api/files/<nid:\d+>',
-		'controller' => __NAMESPACE__ . '\CompatGetOperation',
+		'controller' => CompatGetOperation::class,
 		'via' => Request::METHOD_GET
 
 	],
@@ -42,7 +44,7 @@ return [
 	'api:files/compat-download' => [
 
 		'pattern' => '/api/files/<nid:\d+>/download',
-		'controller' => __NAMESPACE__ . '\CompatDownloadOperation',
+		'controller' => CompatDownloadOperation::class,
 		'via' => Request::METHOD_GET
 
 	],
@@ -50,7 +52,7 @@ return [
 	'files/get' => [
 
 		'pattern' => '/files/<uuid:[0-9a-z\-]{36}>',
-		'controller' => __NAMESPACE__ . '\GetController',
+		'controller' => GetController::class,
 		'via' => Request::METHOD_GET
 
 	],
@@ -58,8 +60,9 @@ return [
 	'files/download' => [
 
 		'pattern' => '/files/<uuid:[0-9a-z\-]{36}>/download',
-		'controller' => __NAMESPACE__ . '\DownloadController',
+		'controller' => DownloadController::class,
 		'via' => Request::METHOD_GET
 
 	]
-];
+
+] + Make::admin('files', Routing\FilesAdminController::class);
