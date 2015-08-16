@@ -11,6 +11,10 @@
 
 namespace Icybee\Modules\Files;
 
+use ICanBoogie\HTTP\AuthenticationRequired;
+use ICanBoogie\Operation;
+use Icybee\Binding\ObjectBindings;
+
 /**
  * Get a file.
  *
@@ -18,10 +22,12 @@ namespace Icybee\Modules\Files;
  *
  * Offline files cannot be obtained by visitors.
  *
- * @property-read $record File
+ * @property $record File
  */
-class GetOperation extends \ICanBoogie\Operation
+class GetOperation extends Operation
 {
+	use ObjectBindings;
+
 	const CACHE_MAX_AGE = 2592000; // One month
 
 	/**
@@ -42,14 +48,14 @@ class GetOperation extends \ICanBoogie\Operation
 
 		if (!$uuid)
 		{
-			return;
+			return null;
 		}
 
 		$nid = $this->module->model->select('nid')->filter_by_uuid($uuid)->rc;
 
 		if (!$nid)
 		{
-			return;
+			return null;
 		}
 
 		return $this->module->model[$nid];
@@ -58,22 +64,24 @@ class GetOperation extends \ICanBoogie\Operation
 	/**
 	 * Overrides the method to check the availability of the record to the requesting user.
 	 *
-	 * @throws HTTPException with HTTP code 401, if the user is a guest and the record is
+	 * @throws AuthenticationRequired with HTTP code 401, if the user is a guest and the record is
 	 * offline.
 	 */
 	protected function control_record()
 	{
+		/* @var $record File */
+
 		$record = parent::control_record();
 
 		if ($record && $this->app->user->is_guest && !$record->is_online)
 		{
-			throw new \Exception
+			throw new AuthenticationRequired
 			(
 				\ICanBoogie\format('The requested resource requires authentication: %resource', [
 
 					'%resource' => $record->constructor . '/' . $this->key
 
-				]), 401
+				])
 			);
 		}
 
@@ -104,6 +112,7 @@ class GetOperation extends \ICanBoogie\Operation
 		if ($request->cache_control->cacheable != 'no-cache')
 		{
 			$if_none_match = $request->headers['If-None-Match'];
+			/* @var $if_modified_since \ICanBoogie\DateTime */
 			$if_modified_since = $request->headers['If-Modified-Since'];
 
 			if (!$if_modified_since->is_empty

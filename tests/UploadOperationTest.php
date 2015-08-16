@@ -187,6 +187,9 @@ namespace Icybee\Modules\Files\UploadOperationTest;
 
 use ICanBoogie\HTTP\Request;
 
+/**
+ * @property \ICanBoogie\Core|\ICanBoogie\Module\CoreBindings $app
+ */
 class FakeUploadOperation extends \Icybee\Modules\Files\UploadOperation
 {
 	public function __invoke(Request $request)

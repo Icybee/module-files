@@ -11,17 +11,24 @@
 
 namespace Icybee\Modules\Files;
 
+use ICanboogie\Errors;
+use ICanBoogie\HTTP\File as HTTPFile;
 use ICanBoogie\HTTP\Request;
+use ICanBoogie\Operation;
+use Icybee\Binding\ObjectBindings;
 
 /**
  * Upload a file to the repository's temporary folder.
  *
- * @property-read \ICanBoogie\HTTP\File $file The uploaded file.
+ * @property-read HTTPFile $file The uploaded file.
+ * @property Module $module
  */
-class UploadOperation extends \ICanBoogie\Operation
+class UploadOperation extends Operation
 {
+	use ObjectBindings;
+
 	/**
-	 * @var \ICanBoogie\HTTP\File The target file of the operation.
+	 * @var HTTPFile The target file of the operation.
 	 */
 	protected $file;
 
@@ -57,8 +64,10 @@ class UploadOperation extends \ICanBoogie\Operation
 
 	/**
 	 * Validates the operation if the file upload succeeded.
+	 *
+	 * @inheritdoc
 	 */
-	protected function validate(\ICanboogie\Errors $errors)
+	protected function validate(Errors $errors)
 	{
 		#
 		# forces 'application/json' response type
@@ -101,7 +110,7 @@ class UploadOperation extends \ICanBoogie\Operation
 	{
 		$file = $this->file;
 
-		$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . uniqid(null, true) . $file->extension;
+		$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . uniqid(null, true);
 
 		$file->move($pathname);
 

@@ -16,7 +16,7 @@ use ICanBoogie\Routing\Controller;
 
 class GetController extends Controller
 {
-	public function __invoke(Request $request)
+	public function action(Request $request)
 	{
 		$uuid = $request['uuid'];
 		$route = \ICanBoogie\app()->routes['api:files/get']->format([ 'uuid' => $uuid ]);

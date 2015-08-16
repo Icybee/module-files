@@ -54,7 +54,7 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 
 				Element::CHILDREN => [
 
-					I18n\t('The folder %folder is not writable !', [ '%folder' => $folder ])
+					$this->t('The folder %folder is not writable !', [ '%folder' => $folder ])
 
 				]
 			];

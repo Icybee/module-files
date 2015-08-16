@@ -107,7 +107,7 @@ class File extends Node
 
 		if (!$extension)
 		{
-			return;
+			return '';
 		}
 
 		return '.' . $extension;

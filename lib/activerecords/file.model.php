@@ -19,7 +19,7 @@ class Model extends \Icybee\Modules\Nodes\Model
 	public function save(array $properties, $key = null, array $options = [])
 	{
 		#
-		# because the newly uploaded file might not overrite the previous file if there extensions
+		# because the newly uploaded file might not overwrite the previous file if there extensions
 		# don't match, we use the $delete variable to delete the previous file. the variable
 		# is defined after an upload.
 		#
@@ -36,6 +36,7 @@ class Model extends \Icybee\Modules\Nodes\Model
 
 		$previous_title = null;
 		$previous_path = null;
+		$extension = null;
 
 		#
 		# If we are modifying an entry, we load its previous values to check for updates related
@@ -49,6 +50,7 @@ class Model extends \Icybee\Modules\Nodes\Model
 			#
 
 			$previous = $this->select('title, path, mime')->filter_by_nid($key)->one;
+			$previous_mime = null;
 
 			#
 			# extract previous to obtain previous_title, previous_path and previous_mime
@@ -64,6 +66,7 @@ class Model extends \Icybee\Modules\Nodes\Model
 			/* @var $file \ICanBoogie\HTTP\File */
 
 			$file = $properties[File::HTTP_FILE];
+			$extension = $file->extension;
 
 			$delete = $previous_path;
 			$path = \ICanBoogie\strip_root($file->pathname);
@@ -94,7 +97,7 @@ class Model extends \Icybee\Modules\Nodes\Model
 		# before we continue, we have to check if we can actually move the file to the repository
 		#
 
-		$path = self::make_path($key, $title, $previous_path, $mime);
+		$path = self::make_path($key, $title, $previous_path, $mime, $extension);
 
 		$root = \ICanBoogie\DOCUMENT_ROOT;
 		$parent = dirname($path);
@@ -161,7 +164,7 @@ class Model extends \Icybee\Modules\Nodes\Model
 		return $rc;
 	}
 
-	static protected function make_path($key, $title, $path, $mime)
+	static protected function make_path($key, $title, $path, $mime, $extension = null)
 	{
 		$base = dirname($mime);
 
@@ -182,8 +185,16 @@ class Model extends \Icybee\Modules\Nodes\Model
 		# append extension
 		#
 
-		$extension = pathinfo($path, PATHINFO_EXTENSION) ?: 'file';
+		if (!$extension)
+		{
+			$extension = pathinfo($path, PATHINFO_EXTENSION) ?: 'file';
 
-		return $rc . '.' . $extension;
+			if ($extension)
+			{
+				$extension = '.' . $extension;
+			}
+		}
+
+		return $rc . $extension;
 	}
 }

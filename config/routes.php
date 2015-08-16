@@ -65,4 +65,8 @@ return [
 
 	]
 
-] + Make::admin('files', Routing\FilesAdminController::class);
+] + Make::admin('files', Routing\FilesAdminController::class, [
+
+	'id_name' => 'nid'
+
+]);

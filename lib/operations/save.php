@@ -11,13 +11,16 @@
 
 namespace Icybee\Modules\Files;
 
+use ICanBoogie\Errors;
 use ICanBoogie\HTTP\Request;
-use ICanBoogie\strip_root;
+use ICanBoogie\HTTP\File as HTTPFile;
 
 /**
  * Save a file.
  *
  * @property-read \ICanBoogie\HTTP\File|null $file The file associated with the request.
+ * @property Module $module
+ * @property File $record
  */
 class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 {
@@ -92,6 +95,8 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 	 *
 	 * TODO: maybe this is not ideal, since the file upload should be made optional when the form
 	 * is generated to edit existing entries.
+	 *
+	 * @inheritdoc
 	 */
 	protected function control(array $controls)
 	{
@@ -141,8 +146,10 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 
 	/**
 	 * The method validates unless there was an error during the file upload.
+	 *
+	 * @inheritdoc
 	 */
-	protected function validate(\ICanboogie\Errors $errors)
+	protected function validate(Errors $errors)
 	{
 		$file = $this->file;
 
@@ -213,26 +220,29 @@ class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
 
 		if (!file_exists($info_pathname))
 		{
-			return;
+			return null;
 		}
 
 		$properties = json_decode(file_get_contents($info_pathname), true);
 
 		if (!$properties)
 		{
-			return;
+			return null;
 		}
 
-		return \ICanBoogie\HTTP\File::from($properties);
+		return HTTPFile::from($properties);
 	}
 }
 
 namespace Icybee\Modules\Files\File;
 
+use ICanBoogie\Event;
+use Icybee\Modules\Files\File;
+
 /**
  * Event class for the `Icybee\Modules\Files\File` event.
  */
-class MoveEvent extends \ICanBoogie\Event
+class MoveEvent extends Event
 {
 	/**
 	 * Previous path.
@@ -251,11 +261,11 @@ class MoveEvent extends \ICanBoogie\Event
 	/**
 	 * The event is constructed with the type `move`.
 	 *
-	 * @param \Icybee\Modules\Files\File $target
+	 * @param File $target
 	 * @param string $from Previous path.
 	 * @param string $to New path.
 	 */
-	public function __construct(\Icybee\Modules\Files\File $target, $from, $to)
+	public function __construct(File $target, $from, $to)
 	{
 		$this->from = $from;
 		$this->to = $to;

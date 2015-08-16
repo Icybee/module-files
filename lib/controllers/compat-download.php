@@ -13,10 +13,13 @@ namespace Icybee\Modules\Files;
 
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Routing\Controller;
+use Icybee\Binding\ObjectBindings;
 
 class CompatDownloadController extends Controller
 {
-	public function __invoke(Request $request)
+	use ObjectBindings;
+
+	public function action(Request $request)
 	{
 		$nid = $request['nid'];
 		$record = $this->app->modules['files'][$nid];

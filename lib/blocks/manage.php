@@ -61,6 +61,7 @@ use Brickrouge\A;
 
 use Icybee\ManageBlock\Column;
 use Icybee\ManageBlock\FilterDecorator;
+use Icybee\Modules\Files\File;
 
 /**
  * Representation of the `mime` column.
@@ -122,6 +123,8 @@ class SizeColumn extends \Icybee\ManageBlock\SizeColumn
 
 	/**
 	 * Adds support for the `size` filter.
+	 *
+	 * @inheritdoc
 	 */
 	public function alter_query_with_filter(Query $query, $filter_value)
 	{
@@ -166,6 +169,11 @@ class DownloadColumn extends \Icybee\ManageBlock\Column
 		]);
 	}
 
+	/**
+	 * @param File $record
+	 *
+	 * @inheritdoc
+	 */
 	public function render_cell($record)
 	{
 		return new A('', $record->url('download'), [
