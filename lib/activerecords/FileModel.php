@@ -11,7 +11,9 @@
 
 namespace Icybee\Modules\Files;
 
-class Model extends \Icybee\Modules\Nodes\Model
+use Icybee\Modules\Nodes\NodeModel;
+
+class FileModel extends NodeModel
 {
 	const ACCEPT = '#files-accept';
 	const UPLOADED = '#files-uploaded';
