@@ -11,15 +11,18 @@
 
 namespace Icybee\Modules\Files;
 
+use ICanBoogie\Binding\Routing\ForwardUndefinedPropertiesToApplication;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Routing\Controller;
 
 class GetController extends Controller
 {
+	use ForwardUndefinedPropertiesToApplication;
+
 	public function action(Request $request)
 	{
 		$uuid = $request['uuid'];
-		$route = \ICanBoogie\app()->routes['api:files/get']->format([ 'uuid' => $uuid ]);
+		$route = $this->routes['api:files/get']->format([ 'uuid' => $uuid ]);
 		$request = Request::from($route);
 
 		return $request();

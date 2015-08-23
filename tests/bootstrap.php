@@ -11,6 +11,7 @@
 
 namespace Icybee\Modules\Files;
 
+use ICanBoogie\Core;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
 
@@ -59,6 +60,8 @@ function create_file($src, array $attributes=[])
 {
 	$app = \ICanBoogie\app();
 
+	/* @var $user User */
+
 	$user = $app->models['users'][1];
 	$user->login();
 
@@ -93,11 +96,9 @@ function create_file($src, array $attributes=[])
 	return $operation->record;
 }
 
-#
-# Create the _core_ instance used for the tests.
-#
+/* @var $app Core|\ICanBoogie\Module\CoreBindings|\Icybee\Modules\Sites\Binding\CoreBindings */
 
-$app = new \ICanBoogie\Core(\ICanBoogie\array_merge_recursive(\ICanBoogie\get_autoconfig(), [
+$app = new Core(\ICanBoogie\array_merge_recursive(\ICanBoogie\get_autoconfig(), [
 
 	'config-path' => [
 

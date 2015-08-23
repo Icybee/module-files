@@ -13,6 +13,7 @@ namespace Icybee\Modules\Files;
 
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
+use Icybee\Modules\Users\User;
 
 // use Icybee\Modules\Files\SaveOperationTest\FakeSaveOperation;
 
@@ -21,7 +22,7 @@ use ICanBoogie\Operation;
 class SaveOperationTest extends \PHPUnit_Framework_TestCase
 {
 	/**
-	 * @var \ICanBoogie\Core
+	 * @var \ICanBoogie\Core|\Icybee\Binding\CoreBindings
 	 */
 	static private $app;
 
@@ -42,8 +43,12 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 
 	static public function setupBeforeClass()
 	{
+		/* @var $user User */
+
 		self::$app = \ICanBoogie\app();
-		self::$app->models['users'][1]->login();
+
+		$user = self::$app->models['users'][1];
+		$user->login();
 	}
 
 	static public function tearDownAfterClass()

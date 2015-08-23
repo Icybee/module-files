@@ -11,18 +11,22 @@
 
 namespace Icybee\Modules\Files;
 
+use ICanBoogie\Binding\Routing\ForwardUndefinedPropertiesToApplication;
 use ICanBoogie\HTTP\Request;
+use ICanBoogie\Module\CoreBindings;
 use ICanBoogie\Routing\Controller;
-use Icybee\Binding\ObjectBindings;
 
 class CompatDownloadController extends Controller
 {
-	use ObjectBindings;
+	use ForwardUndefinedPropertiesToApplication;
+	use CoreBindings;
 
 	public function action(Request $request)
 	{
+		/* @var $record File */
+
 		$nid = $request['nid'];
-		$record = $this->app->modules['files'][$nid];
+		$record = $this->modules['files'][$nid];
 		$request = Request::from($record->url('download'));
 
 		return $request();

@@ -15,13 +15,14 @@ use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
 
 use Icybee\Modules\Files\UploadOperationTest\FakeUploadOperation;
+use Icybee\Modules\Users\User;
 
 /* @var $response \ICanBoogie\Operation\Response */
 
 class UploadOperationTest extends \PHPUnit_Framework_TestCase
 {
 	/**
-	 * @var \ICanBoogie\Core
+	 * @var \ICanBoogie\Core|\Icybee\Binding\CoreBindings
 	 */
 	static private $app;
 
@@ -34,8 +35,12 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 
 	static public function setupBeforeClass()
 	{
+		/* @var $user User */
+
 		self::$app = \ICanBoogie\app();
-		self::$app->models['users'][1]->login();
+
+		$user = self::$app->models['users'][1];
+		$user->login();
 	}
 
 	static public function tearDownAfterClass()
