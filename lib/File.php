@@ -113,7 +113,7 @@ class File extends Node
 		return '.' . $extension;
 	}
 
-	public function url($type='view')
+	public function url($type = 'view')
 	{
 		$routes = $this->app->routes;
 		$route_id = "{$this->constructor}/$type";
@@ -123,7 +123,7 @@ class File extends Node
 			return $routes[$route_id]->format($this);
 		}
 
-		$route_id = "files/$type";
+		$route_id = "files:$type";
 
 		if (isset($routes[$route_id]))
 		{

@@ -11,6 +11,8 @@
 
 namespace Icybee\Modules\Files;
 
+use ICanBoogie\Errors;
+
 class Module extends \Icybee\Modules\Nodes\Module
 {
 	const OPERATION_UPLOAD = 'upload';
@@ -19,8 +21,10 @@ class Module extends \Icybee\Modules\Nodes\Module
 	 * Overrides the method to create the "/repository/tmp/" and "/repository/files/" directories,
 	 * and add a ".htaccess" file in the "/repository/tmp/" directory which denies all access and
 	 * a ".htaccess" file in the "/repository/files/" directory which allows all access.
+	 *
+	 * @inheritdoc
 	 */
-	public function install(\ICanBoogie\Errors $errors)
+	public function install(Errors $errors)
 	{
 		$repository = \ICanBoogie\REPOSITORY;
 
@@ -79,8 +83,10 @@ class Module extends \Icybee\Modules\Nodes\Module
 
 	/**
 	 * Checks that the "tmp" and "files" directories exist in the repository.
+	 *
+	 * @inheritdoc
 	 */
-	public function is_installed(\ICanBoogie\Errors $errors)
+	public function is_installed(Errors $errors)
 	{
 		$repository = \ICanBoogie\REPOSITORY;
 
@@ -109,7 +115,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 		return parent::is_installed($errors);
 	}
 
-	public function clean_temporary_files($lifetime=3600)
+	public function clean_temporary_files($lifetime = 3600)
 	{
 		$path = \ICanBoogie\REPOSITORY . 'tmp';
 

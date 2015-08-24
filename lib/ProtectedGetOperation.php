@@ -11,7 +11,7 @@
 
 namespace Icybee\Modules\Files;
 
-class CompatGetOperation extends GetOperation
+class ProtectedShowOperation extends ShowOperation
 {
 	protected function lazy_get_record()
 	{

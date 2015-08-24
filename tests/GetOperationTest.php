@@ -69,7 +69,7 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 
 		$headers = $response->headers;
 
-		$this->assertEquals('public, max-age=' . GetOperation::CACHE_MAX_AGE, (string) $headers['Cache-Control']);
+		$this->assertEquals('public, max-age=' . ShowOperation::CACHE_MAX_AGE, (string) $headers['Cache-Control']);
 		$this->assertNotEmpty((string) $headers['Etag']);
 		$this->assertNotEmpty((string) $headers['Expires']);
 		$this->assertEquals(filesize(__FILE__), (string) $headers['Content-Length']);
@@ -107,7 +107,7 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 
 		$this->assertEquals(304, $response->status->code);
 		$this->assertTrue($response->rc);
-		$this->assertEquals('public, max-age=' . GetOperation::CACHE_MAX_AGE, (string) $response->cache_control);
+		$this->assertEquals('public, max-age=' . ShowOperation::CACHE_MAX_AGE, (string) $response->cache_control);
 		$this->assertEquals((string) $headers['Etag'], (string) $response->headers['Etag']);
 		$this->assertNotEmpty((string) $headers['Expires']);
 
@@ -133,7 +133,7 @@ class GetOperationTest extends \PHPUnit_Framework_TestCase
 
 		$headers = $response->headers;
 
-		$this->assertEquals('public, max-age=' . GetOperation::CACHE_MAX_AGE, (string) $headers['Cache-Control']);
+		$this->assertEquals('public, max-age=' . ShowOperation::CACHE_MAX_AGE, (string) $headers['Cache-Control']);
 		$this->assertNotEmpty((string) $headers['Etag']);
 		$this->assertNotEmpty((string) $headers['Expires']);
 		$this->assertEquals(filesize(__FILE__), (string) $headers['Content-Length']);

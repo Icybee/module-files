@@ -18,7 +18,7 @@ namespace Icybee\Modules\Files;
  *
  * Offline files cannot be downloaded by visitors.
  */
-class DownloadOperation extends GetOperation
+class DownloadOperation extends ShowOperation
 {
 	protected function process()
 	{

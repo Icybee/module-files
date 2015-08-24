@@ -17,15 +17,15 @@ use Icybee\Routing\RouteMaker as Make;
 
 return [
 
-	'api:files/get' => [
+	'api:files:show' => [
 
 		'pattern' => '/api/files/<uuid:[0-9a-z\-]{36}>',
-		'controller' => GetOperation::class,
+		'controller' => ShowOperation::class,
 		'via' => Request::METHOD_GET
 
 	],
 
-	'api:files/download' => [
+	'api:files:download' => [
 
 		'pattern' => '/api/files/<uuid:[0-9a-z\-]{36}>/download',
 		'controller' => DownloadOperation::class,
@@ -33,15 +33,15 @@ return [
 
 	],
 
-	'api:files/compat-get' => [
+	'api:files:protected-show' => [
 
 		'pattern' => '/api/files/<nid:\d+>',
-		'controller' => CompatGetOperation::class,
+		'controller' => ProtectedShowOperation::class,
 		'via' => Request::METHOD_GET
 
 	],
 
-	'api:files/compat-download' => [
+	'api:files:protected-download' => [
 
 		'pattern' => '/api/files/<nid:\d+>/download',
 		'controller' => CompatDownloadOperation::class,
@@ -49,18 +49,18 @@ return [
 
 	],
 
-	'files/get' => [
+	'files:show' => [
 
 		'pattern' => '/files/<uuid:[0-9a-z\-]{36}>',
-		'controller' => GetController::class,
+		'controller' => Routing\FilesController::class . '#show',
 		'via' => Request::METHOD_GET
 
 	],
 
-	'files/download' => [
+	'files:download' => [
 
 		'pattern' => '/files/<uuid:[0-9a-z\-]{36}>/download',
-		'controller' => DownloadController::class,
+		'controller' => Routing\FilesController::class . '#download',
 		'via' => Request::METHOD_GET
 
 	]

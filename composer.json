@@ -35,7 +35,9 @@
 	},
 
 	"autoload": {
-		"classmap": [ "lib" ]
+		"psr-4": {
+			"Icybee\\Modules\\Files\\": "lib"
+		}
 	},
 
 	"scripts": {

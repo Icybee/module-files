@@ -11,12 +11,15 @@
 
 namespace Icybee\Modules\Files;
 
+use ICanBoogie\Errors;
 use ICanBoogie\HTTP\AuthenticationRequired;
+use ICanBoogie\HTTP\Status;
 use ICanBoogie\Operation;
+
 use Icybee\Binding\ObjectBindings;
 
 /**
- * Get a file.
+ * Shows a file.
  *
  * The file transfer is handled by PHP, the location of the file is not be revealed.
  *
@@ -24,7 +27,7 @@ use Icybee\Binding\ObjectBindings;
  *
  * @property $record File
  */
-class GetOperation extends Operation
+class ShowOperation extends Operation
 {
 	use ObjectBindings;
 
@@ -32,6 +35,8 @@ class GetOperation extends Operation
 
 	/**
 	 * Controls for the operation: record.
+	 *
+	 * @inheritdoc
 	 */
 	protected function get_controls()
 	{
@@ -42,6 +47,11 @@ class GetOperation extends Operation
 		] + parent::get_controls();
 	}
 
+	/**
+	 * @inheritdoc
+	 *
+	 * @return File
+	 */
 	protected function lazy_get_record()
 	{
 		$uuid = $this->request['uuid'];
@@ -62,7 +72,11 @@ class GetOperation extends Operation
 	}
 
 	/**
-	 * Overrides the method to check the availability of the record to the requesting user.
+	 * @inheritdoc
+	 *
+	 * Checks the availability of the record to the requesting user.
+	 *
+	 * @return File
 	 *
 	 * @throws AuthenticationRequired with HTTP code 401, if the user is a guest and the record is
 	 * offline.
@@ -88,11 +102,17 @@ class GetOperation extends Operation
 		return $record;
 	}
 
-	protected function validate(\ICanboogie\Errors $errors)
+	/**
+	 * @inheritdoc
+	 */
+	protected function validate(Errors $errors)
 	{
 		return true;
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	protected function process()
 	{
 		/* @var $record File */
@@ -111,15 +131,16 @@ class GetOperation extends Operation
 
 		if ($request->cache_control->cacheable != 'no-cache')
 		{
-			$if_none_match = $request->headers['If-None-Match'];
 			/* @var $if_modified_since \ICanBoogie\DateTime */
+
+			$if_none_match = $request->headers['If-None-Match'];
 			$if_modified_since = $request->headers['If-Modified-Since'];
 
 			if (!$if_modified_since->is_empty
 			&& $if_modified_since->timestamp >= $modified_time
 			&& $if_none_match == $hash)
 			{
-				$response->status = 304;
+				$response->status = Status::NOT_MODIFIED;
 
 				#
 				# WARNING: do *not* send any data after that
