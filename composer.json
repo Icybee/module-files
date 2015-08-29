@@ -23,8 +23,8 @@
 	"require": {
 		"php": ">=5.5.0",
 		"icanboogie/module-installer": "^1.2.3",
-		"icybee/module-registry": "^2.1.0",
-		"icybee/module-nodes": "^2.1.0"
+		"icybee/module-registry": "^3.0.0",
+		"icybee/module-nodes": "^3.0.0"
 	},
 
 	"require-dev": {
