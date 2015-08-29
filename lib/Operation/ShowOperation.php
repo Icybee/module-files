@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Icybee\Modules\Files;
+namespace Icybee\Modules\Files\Operation;
 
 use ICanBoogie\Errors;
 use ICanBoogie\HTTP\AuthenticationRequired;
@@ -17,6 +17,7 @@ use ICanBoogie\HTTP\Status;
 use ICanBoogie\Operation;
 
 use Icybee\Binding\ObjectBindings;
+use Icybee\Modules\Files\File;
 
 /**
  * Shows a file.

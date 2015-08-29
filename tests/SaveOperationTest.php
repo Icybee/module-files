@@ -13,6 +13,7 @@ namespace Icybee\Modules\Files;
 
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
+use Icybee\Modules\Files\Operation\SaveOperation;
 use Icybee\Modules\Users\User;
 
 // use Icybee\Modules\Files\SaveOperationTest\FakeSaveOperation;

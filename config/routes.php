@@ -13,6 +13,10 @@ namespace Icybee\Modules\Files;
 
 use ICanBoogie\HTTP\Request;
 
+use Icybee\Modules\Files\Operation\CompatDownloadOperation;
+use Icybee\Modules\Files\Operation\DownloadOperation;
+use Icybee\Modules\Files\Operation\ProtectedShowOperation;
+use Icybee\Modules\Files\Operation\ShowOperation;
 use Icybee\Routing\RouteMaker as Make;
 
 return [

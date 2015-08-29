@@ -15,6 +15,7 @@ use ICanBoogie\Core;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
 
+use Icybee\Modules\Files\Operation\SaveOperation;
 use Icybee\Modules\Users\User;
 
 $_SERVER['DOCUMENT_ROOT'] = __DIR__;

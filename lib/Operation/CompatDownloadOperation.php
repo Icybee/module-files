@@ -9,9 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Icybee\Modules\Files;
+namespace Icybee\Modules\Files\Operation;
 
-class DeleteOperation extends \Icybee\Modules\Nodes\DeleteOperation
+class CompatDownloadOperation extends DownloadOperation
 {
+	protected function lazy_get_record()
+	{
+		$nid = $this->request['nid'];
 
+		return $nid ? $this->module->model[$nid] : null;
+	}
 }

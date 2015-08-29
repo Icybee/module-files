@@ -9,9 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Icybee\Modules\Files;
+namespace Icybee\Modules\Files\Operation;
 
-class ConfigOperation extends \Icybee\Modules\Nodes\ConfigOperation
+class ProtectedShowOperation extends ShowOperation
 {
+	protected function lazy_get_record()
+	{
+		$nid = $this->request['nid'];
 
+		return $nid ? $this->module->model[$nid] : null;
+	}
 }

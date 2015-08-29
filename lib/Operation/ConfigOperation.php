@@ -9,14 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Icybee\Modules\Files;
+namespace Icybee\Modules\Files\Operation;
 
-class CompatDownloadOperation extends DownloadOperation
+class ConfigOperation extends \Icybee\Modules\Nodes\Operation\ConfigOperation
 {
-	protected function lazy_get_record()
-	{
-		$nid = $this->request['nid'];
 
-		return $nid ? $this->module->model[$nid] : null;
-	}
 }

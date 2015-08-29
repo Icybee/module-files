@@ -9,13 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Icybee\Modules\Files;
+namespace Icybee\Modules\Files\Operation;
 
 use ICanboogie\Errors;
 use ICanBoogie\HTTP\File as HTTPFile;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
+
 use Icybee\Binding\ObjectBindings;
+use Icybee\Modules\Files\Module;
 
 /**
  * Upload a file to the repository's temporary folder.

@@ -14,6 +14,7 @@ namespace Icybee\Modules\Files;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
 
+use Icybee\Modules\Files\Operation\SaveOperation;
 use Icybee\Modules\Files\UploadOperationTest\FakeUploadOperation;
 use Icybee\Modules\Users\User;
 
@@ -195,7 +196,7 @@ use ICanBoogie\HTTP\Request;
 /**
  * @property \ICanBoogie\Core|\ICanBoogie\Module\CoreBindings $app
  */
-class FakeUploadOperation extends \Icybee\Modules\Files\UploadOperation
+class FakeUploadOperation extends \Icybee\Modules\Files\Operation\UploadOperation
 {
 	public function __invoke(Request $request)
 	{

@@ -9,11 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Icybee\Modules\Files;
+namespace Icybee\Modules\Files\Operation;
 
 use ICanBoogie\Errors;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\HTTP\File as HTTPFile;
+
+use Icybee\Modules\Files\File;
+use Icybee\Modules\Files\Module;
 
 /**
  * Save a file.
@@ -22,7 +25,7 @@ use ICanBoogie\HTTP\File as HTTPFile;
  * @property Module $module
  * @property File $record
  */
-class SaveOperation extends \Icybee\Modules\Nodes\SaveOperation
+class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 {
 	/**
 	 * Name of the _user-file_ slot.

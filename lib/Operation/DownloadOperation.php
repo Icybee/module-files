@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Icybee\Modules\Files;
+namespace Icybee\Modules\Files\Operation;
 
 /**
  * Downloads a file.
