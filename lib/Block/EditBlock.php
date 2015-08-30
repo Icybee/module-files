@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Icybee\Modules\Files;
+namespace Icybee\Modules\Files\Block;
 
 use ICanBoogie\I18n;
 use ICanBoogie\Operation;
@@ -18,7 +18,10 @@ use Brickrouge\Element;
 use Brickrouge\Document;
 use Brickrouge\Form;
 
-class EditBlock extends \Icybee\Modules\Nodes\EditBlock
+use Icybee\Modules\Files as Root;
+use Icybee\Modules\Files\File;
+
+class EditBlock extends \Icybee\Modules\Nodes\Block\EditBlock
 {
 	const ACCEPT = '#files-accept';
 	const UPLOADER_CLASS = 'uploader class';
@@ -30,8 +33,8 @@ class EditBlock extends \Icybee\Modules\Nodes\EditBlock
 	{
 		parent::add_assets($document);
 
-		$document->css->add(DIR . 'public/edit.css');
-		$document->js->add(DIR . 'public/edit.js');
+		$document->css->add(Root\DIR . 'public/edit.css');
+		$document->js->add(Root\DIR . 'public/EditBlock.js');
 	}
 
 	protected function lazy_get_values()

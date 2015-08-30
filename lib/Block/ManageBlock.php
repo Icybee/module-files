@@ -9,18 +9,24 @@
  * file that was distributed with this source code.
  */
 
-namespace Icybee\Modules\Files;
+namespace Icybee\Modules\Files\Block;
+
+use Brickrouge\Document;
+
+use Icybee\Modules\Files as Root;
+use Icybee\Modules\Files\File;
+use Icybee\Modules\Files\Module;
 
 /**
  * A block to manage files.
  */
-class ManageBlock extends \Icybee\Modules\Nodes\ManageBlock
+class ManageBlock extends \Icybee\Modules\Nodes\Block\ManageBlock
 {
-	static protected function add_assets(\Brickrouge\Document $document)
+	static protected function add_assets(Document $document)
 	{
 		parent::add_assets($document);
 
-		$document->css->add(DIR . '/public/manage.css');
+		$document->css->add(Root\DIR . '/public/manage.css');
 	}
 
 	public function __construct(Module $module, array $attributes)
@@ -53,14 +59,14 @@ class ManageBlock extends \Icybee\Modules\Nodes\ManageBlock
 	}
 }
 
-namespace Icybee\Modules\Files\ManageBlock;
+namespace Icybee\Modules\Files\Block\ManageBlock;
 
 use ICanBoogie\ActiveRecord\Query;
 
 use Brickrouge\A;
 
-use Icybee\ManageBlock\Column;
-use Icybee\ManageBlock\FilterDecorator;
+use Icybee\Block\ManageBlock\Column;
+use Icybee\Block\ManageBlock\FilterDecorator;
 use Icybee\Modules\Files\File;
 
 /**
@@ -77,9 +83,9 @@ class MimeColumn extends Column
 /**
  * Representation of the `size` column.
  */
-class SizeColumn extends \Icybee\ManageBlock\SizeColumn
+class SizeColumn extends \Icybee\Block\ManageBlock\SizeColumn
 {
-	public function __construct(\Icybee\ManageBlock $manager, $id, array $options=[])
+	public function __construct(\Icybee\Block\ManageBlock $manager, $id, array $options=[])
 	{
 		parent::__construct($manager, $id, $options + [
 
@@ -157,9 +163,9 @@ class SizeColumn extends \Icybee\ManageBlock\SizeColumn
 /**
  * Representation of the `download` column.
  */
-class DownloadColumn extends \Icybee\ManageBlock\Column
+class DownloadColumn extends \Icybee\Block\ManageBlock\Column
 {
-	public function __construct(\Icybee\ManageBlock $manager, $id, array $options=[])
+	public function __construct(\Icybee\Block\ManageBlock $manager, $id, array $options=[])
 	{
 		parent::__construct($manager, $id, [
 
