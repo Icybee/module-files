@@ -20,34 +20,8 @@ use Icybee\Modules\Users\User;
 
 $_SERVER['DOCUMENT_ROOT'] = __DIR__;
 
-if (!file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'repository'))
-{
-	mkdir(__DIR__ . DIRECTORY_SEPARATOR . 'repository');
-}
-
-require __DIR__ . '/../vendor/autoload.php';
-
-/**
- * A save operation that doesn't require form validation.
- */
-class FakeSaveOperation extends SaveOperation
-{
-	public function __invoke(Request $request)
-	{
-		$this->module = $this->app->modules['files'];
-
-		return parent::__invoke($request);
-	}
-
-	protected function get_controls()
-	{
-		return [
-
-			self::CONTROL_FORM => false
-
-		] + parent::get_controls();
-	}
-}
+$autoload = require __DIR__ . '/../vendor/autoload.php';
+$autoload->addPsr4('Icybee\Modules\Files\\', __DIR__);
 
 /**
  * Create a new file record.
@@ -90,7 +64,7 @@ function create_file($src, array $attributes=[])
 	]);
 
 	$operation = new FakeSaveOperation;
-	$response = $operation($request);
+	$operation($request);
 
 	$user->logout();
 
@@ -116,30 +90,7 @@ $app = new Core(\ICanBoogie\array_merge_recursive(\ICanBoogie\get_autoconfig(), 
 ]));
 
 $app->boot();
+$app->modules->install();
+$app->site_id = 0; // so we don't have to deal with the website
 
-$errors = $app->modules->install(new \ICanBoogie\Errors());
-
-if ($errors->count())
-{
-	foreach ($errors as $module_id => $error)
-	{
-		echo "$module_id: $error\n";
-	}
-
-	exit(1);
-}
-
-#
-#
-#
-
-$user = User::from([
-
-	'username' => 'admin',
-	'email' => 'admin@example.com'
-
-]);
-
-$app->site_id = 0;
-
-$user->save();
+User::from([ 'username' => 'admin', 'email' => 'admin@example.com' ])->save();

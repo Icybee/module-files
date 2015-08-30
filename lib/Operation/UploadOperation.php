@@ -16,7 +16,7 @@ use ICanBoogie\HTTP\File as HTTPFile;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
 
-use Icybee\Binding\PrototypedBindings;
+use Icybee\Binding\Core\PrototypedBindings;
 use Icybee\Modules\Files\Module;
 
 /**
@@ -24,6 +24,7 @@ use Icybee\Modules\Files\Module;
  *
  * @property-read HTTPFile $file The uploaded file.
  * @property Module $module
+ * @property \ICanBoogie\Core|\Icybee\Binding\Core\CoreBindings|\Icybee\Modules\Registry\Binding\CoreBindings $app
  */
 class UploadOperation extends Operation
 {
@@ -49,12 +50,11 @@ class UploadOperation extends Operation
 	 */
 	protected function get_controls()
 	{
-		return array
-		(
-			self::CONTROL_PERMISSION => Module::PERMISSION_CREATE
-		)
+		return [
 
-		+ parent::get_controls();
+			self::CONTROL_PERMISSION => Module::PERMISSION_CREATE
+
+		] + parent::get_controls();
 	}
 
 	public function __invoke(Request $request)
@@ -111,15 +111,10 @@ class UploadOperation extends Operation
 	protected function process()
 	{
 		$file = $this->file;
-
-		$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . uniqid(null, true);
-
-		$file->move($pathname);
-
-		file_put_contents($pathname . '.info', json_encode($file->to_array()));
-
 		$title = $file->unsuffixed_name;
-		$pathname = \ICanBoogie\strip_root($pathname);
+		$type = $file->type;
+		$pathname = $this->create_temporary_file($file);
+		$relative_pathname = \ICanBoogie\strip_root($pathname);
 
 		$this->response['infos'] = null;
 
@@ -129,8 +124,8 @@ class UploadOperation extends Operation
 
 			$this->response['infos'] = <<<EOT
 <ul class="details">
-	<li><span title="{$pathname}">{$title}</span></li>
-	<li>$file->type</li>
+	<li><span title="{$relative_pathname}">{$title}</span></li>
+	<li>$type</li>
 	<li>$size</li>
 </ul>
 EOT;
@@ -140,8 +135,27 @@ EOT;
 		return array_merge($file->to_array(), [
 
 			'title' => $title,
-			'pathname' => $pathname
+			'type' => $type,
+			'pathname' => $relative_pathname
 
 		]);
+	}
+
+	/**
+	 * Creates temporary file with attached information.
+	 *
+	 * @param HTTPFile $file
+	 *
+	 * @return string
+	 */
+	protected function create_temporary_file(HTTPFile $file)
+	{
+		$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . \ICanBoogie\generate_v4_uuid() . $file->extension;
+
+		$file->move($pathname);
+
+		file_put_contents($pathname . '.info', json_encode($file->to_array()));
+
+		return $pathname;
 	}
 }

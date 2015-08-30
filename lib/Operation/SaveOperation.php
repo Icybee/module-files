@@ -114,7 +114,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 
 		if ($file && $file->is_valid)
 		{
-			$filename = strtr(uniqid(null, true), '.', '-') . $file->extension;
+			$filename = \ICanBoogie\generate_v4_uuid() . $file->extension;
 			$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . $filename;
 
 			$file->move($pathname);

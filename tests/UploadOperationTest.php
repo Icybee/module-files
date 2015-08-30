@@ -12,18 +12,17 @@
 namespace Icybee\Modules\Files;
 
 use ICanBoogie\HTTP\Request;
+use ICanBoogie\HTTP\File as HTTPFile;
 use ICanBoogie\Operation;
 
 use Icybee\Modules\Files\Operation\SaveOperation;
 use Icybee\Modules\Files\UploadOperationTest\FakeUploadOperation;
 use Icybee\Modules\Users\User;
 
-/* @var $response \ICanBoogie\Operation\Response */
-
 class UploadOperationTest extends \PHPUnit_Framework_TestCase
 {
 	/**
-	 * @var \ICanBoogie\Core|\Icybee\Binding\CoreBindings
+	 * @var \ICanBoogie\Core|\Icybee\Binding\Core\CoreBindings|\Icybee\Modules\Users\Binding\CoreBindings
 	 */
 	static private $app;
 
@@ -51,6 +50,9 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 
 	/**
 	 * @dataProvider provide_test_upload_error
+	 *
+	 * @param string $message
+	 * @param array $properties
 	 */
 	public function test_upload_error($message, $properties)
 	{
@@ -68,16 +70,20 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 
 		try
 		{
-			$response = $operation($request);
+			$operation($request);
 
 			$this->fail('The Failure exception should have been raised.');
 		}
-		catch (\ICanBoogie\Operation\Failure $failure)
+		catch (Operation\Failure $failure)
 		{
 			$errors = $failure->operation->response->errors;
 
 			$this->assertNotNull($errors[SaveOperation::USERFILE]);
 			$this->assertStringStartsWith($message, (string) $errors[SaveOperation::USERFILE]);
+		}
+		catch (\Exception $e)
+		{
+			$this->fail('The Failure exception should have been raised.');
 		}
 	}
 
@@ -101,7 +107,7 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 	public function test_successful()
 	{
 		$source = __FILE__;
-		$pathname = DIR . 'tests/sandbox/' . basename(__FILE__);
+		$pathname = __DIR__ . '/sandbox/' . basename(__FILE__);
 
 		copy($source, $pathname);
 
@@ -119,7 +125,7 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 		$response = $operation($request);
 
 		$this->assertTrue($response->status->is_successful);
-		$this->assertInstanceOf('ICanBoogie\HTTP\File', $operation->file);
+		$this->assertInstanceOf(HTTPFile::class, $operation->file);
 
 		$rc = $response->rc;
 		$this->assertArrayHasKey('title', $rc);
@@ -145,7 +151,7 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 	public function test_save_uploaded()
 	{
 		$source = __FILE__;
-		$pathname = DIR . 'tests/sandbox/' . basename(__FILE__);
+		$pathname = __DIR__ . '/sandbox/' . basename(__FILE__);
 
 		copy($source, $pathname);
 
@@ -186,22 +192,5 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals($file->type, $record->mime);
 		$this->assertEquals($file->size, $record->size);
 		$this->assertEquals($file->unsuffixed_name, $record->title);
-	}
-}
-
-namespace Icybee\Modules\Files\UploadOperationTest;
-
-use ICanBoogie\HTTP\Request;
-
-/**
- * @property \ICanBoogie\Core|\ICanBoogie\Module\CoreBindings $app
- */
-class FakeUploadOperation extends \Icybee\Modules\Files\Operation\UploadOperation
-{
-	public function __invoke(Request $request)
-	{
-		$this->module = $this->app->modules['files'];
-
-		return parent::__invoke($request);
 	}
 }

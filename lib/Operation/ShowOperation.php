@@ -16,7 +16,7 @@ use ICanBoogie\HTTP\AuthenticationRequired;
 use ICanBoogie\HTTP\Status;
 use ICanBoogie\Operation;
 
-use Icybee\Binding\PrototypedBindings;
+use Icybee\Binding\Core\PrototypedBindings;
 use Icybee\Modules\Files\File;
 
 /**
