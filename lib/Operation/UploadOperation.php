@@ -16,7 +16,7 @@ use ICanBoogie\HTTP\File as HTTPFile;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
 
-use Icybee\Binding\ObjectBindings;
+use Icybee\Binding\PrototypedBindings;
 use Icybee\Modules\Files\Module;
 
 /**
@@ -27,7 +27,7 @@ use Icybee\Modules\Files\Module;
  */
 class UploadOperation extends Operation
 {
-	use ObjectBindings;
+	use PrototypedBindings;
 
 	/**
 	 * @var HTTPFile The target file of the operation.

@@ -16,7 +16,7 @@ use ICanBoogie\HTTP\AuthenticationRequired;
 use ICanBoogie\HTTP\Status;
 use ICanBoogie\Operation;
 
-use Icybee\Binding\ObjectBindings;
+use Icybee\Binding\PrototypedBindings;
 use Icybee\Modules\Files\File;
 
 /**
@@ -30,7 +30,7 @@ use Icybee\Modules\Files\File;
  */
 class ShowOperation extends Operation
 {
-	use ObjectBindings;
+	use PrototypedBindings;
 
 	const CACHE_MAX_AGE = 2592000; // One month
 
