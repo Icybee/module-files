@@ -17,7 +17,115 @@ class FileModel extends NodeModel
 {
 	const ACCEPT = '#files-accept';
 	const UPLOADED = '#files-uploaded';
+	const MAX_NORMALIZED_TITLE_LENGTH = 64;
 
+	/**
+	 * Makes an absolute path from the specified parameters.
+	 *
+	 * @param int|null $key
+	 * @param string $title
+	 * @param string $extension
+	 *
+	 * @return string
+	 */
+	static protected function make_absolute_path($key, $title, $extension)
+	{
+		if ($key)
+		{
+			$normalized_title = \ICanBoogie\normalize($title);
+
+			if (strlen($normalized_title) > self::MAX_NORMALIZED_TITLE_LENGTH)
+			{
+				$pos = strrpos($normalized_title, '-', -strlen($normalized_title) + self::MAX_NORMALIZED_TITLE_LENGTH);
+
+				$normalized_title = $pos
+					? substr($normalized_title, 0, $pos)
+					: substr($normalized_title, 0, self::MAX_NORMALIZED_TITLE_LENGTH);
+			}
+
+			$filename = $key . '-' . $normalized_title . $extension;
+		}
+		else
+		{
+			$filename = \ICanBoogie\generate_v4_uuid();
+		}
+
+		return \ICanBoogie\REPOSITORY . 'files' . DIRECTORY_SEPARATOR . $filename;
+	}
+
+	/**
+	 * Ensures that a path is absolute.
+	 *
+	 * @param string $path
+	 *
+	 * @return string
+	 */
+	static protected function ensure_path_is_absolute($path)
+	{
+		if (!$path)
+		{
+			return null;
+		}
+
+		$root = \ICanBoogie\DOCUMENT_ROOT;
+
+		if (strpos($path, $root) !== 0)
+		{
+			$path = $root . ltrim($path, DIRECTORY_SEPARATOR);
+		}
+
+		return $path;
+	}
+
+	/**
+	 * Ensures that a path is relative to the document root.
+	 *
+	 * @param string $path
+	 *
+	 * @return string
+	 */
+	static protected function ensure_path_is_relative($path)
+	{
+		$root = \ICanBoogie\DOCUMENT_ROOT;
+
+		if (strpos($path, $root) === 0)
+		{
+			$path = substr($path, strlen($root) - 1);
+		}
+
+		return $path;
+	}
+
+	/**
+	 * Ensures that a path is writable.
+	 *
+	 * @param string $path
+	 *
+	 * @throws \LogicException if the path is not writable.
+	 */
+	static protected function ensure_path_is_writable($path)
+	{
+		$path = self::ensure_path_is_absolute($path);
+		$parent = dirname($path);
+
+		if (!is_dir($parent))
+		{
+			mkdir($parent, 0705, true);
+		}
+
+		if (!is_writable($parent))
+		{
+			throw new \LogicException("The directory is not writable: $parent.");
+		}
+	}
+
+	/*
+	 *
+	 */
+
+	/**
+	 * @inheritdoc
+	 */
 	public function save(array $properties, $key = null, array $options = [])
 	{
 		#
@@ -36,44 +144,17 @@ class FileModel extends NodeModel
 		# If needed, the file is renamed after the entry has been saved.
 		#
 
-		$previous_title = null;
-		$previous_path = null;
+		/* @var $file \ICanBoogie\HTTP\File */
+
+		$file = null;
 		$extension = null;
-
-		#
-		# If we are modifying an entry, we load its previous values to check for updates related
-		# to the title.
-		#
-
-		if ($key)
-		{
-			#
-			# load previous entry to check for changes
-			#
-
-			$previous = $this->select('title, path, mime')->filter_by_nid($key)->one;
-			$previous_mime = null;
-
-			#
-			# extract previous to obtain previous_title, previous_path and previous_mime
-			#
-
-			extract($previous, EXTR_PREFIX_ALL, 'previous');
-
-			$properties[File::MIME] = $previous_mime;
-		}
+		$previous_path = null; // absolute previous path
 
 		if (isset($properties[File::HTTP_FILE]))
 		{
-			/* @var $file \ICanBoogie\HTTP\File */
-
 			$file = $properties[File::HTTP_FILE];
 			$extension = $file->extension;
-
-			$delete = $previous_path;
-			$path = \ICanBoogie\strip_root($file->pathname);
-			$previous_path = $path;
-			$previous_title = null; // setting `previous_title` to null forces the update
+			$previous_path = $file->pathname;
 
 			$properties[File::MIME] = $file->type;
 			$properties[File::SIZE] = $file->size;
@@ -83,30 +164,23 @@ class FileModel extends NodeModel
 				$properties[File::TITLE] = $file->unsuffixed_name;
 			}
 
-			$properties[File::PATH] = $path;
+			$this->ensure_path_is_writable(self::make_absolute_path(null, uniqid(), $file->extension));
 		}
 
-		$title = null;
-
-		if (isset($properties[File::TITLE]))
-		{
-			$title = $properties[File::TITLE];
-		}
-
-		$mime = $properties[File::MIME];
-
 		#
-		# before we continue, we have to check if we can actually move the file to the repository
+		# If we are modifying an entry, we load its previous values to check for updates related
+		# to the title.
 		#
 
-		$path = self::make_path($key, $title, $previous_path, $mime, $extension);
-
-		$root = \ICanBoogie\DOCUMENT_ROOT;
-		$parent = dirname($path);
-
-		if (!is_dir($root . $parent))
+		else if ($key)
 		{
-			mkdir($root . $parent, 0705, true);
+			$previous_path = $this->ensure_path_is_absolute($this->select('path')->filter_by_nid($key)->rc);
+			$extension = pathinfo($previous_path, PATHINFO_EXTENSION);
+
+			if ($extension)
+			{
+				$extension = '.' . $extension;
+			}
 		}
 
 		$key = parent::save($properties, $key, $options);
@@ -116,37 +190,28 @@ class FileModel extends NodeModel
 			return $key;
 		}
 
-		#
-		# change path according to node's title
-		#
+		$update_path = self::make_absolute_path($key, $properties[File::TITLE], $extension);
 
-		if (($path != $previous_path) || (!$previous_title || ($previous_title != $title)))
+		if ($previous_path != $update_path)
 		{
-			$path = self::make_path($key, $title, $previous_path, $mime);
-
-			if ($delete && is_file($root . $delete))
+			if ($file)
 			{
-				unlink($root . $delete);
+				$file->move($update_path);
+			}
+			else
+			{
+				rename($previous_path, $update_path);
 			}
 
-			$ok = rename($root . $previous_path, $root . $path);
-
-			if (!$ok)
-			{
-				throw new \Exception(\ICanBoogie\format('Unable to rename %previous to %path', [
-
-					'previous' => $previous_path,
-					'path' => $path
-
-				]));
-			}
-
-			$this->update([ File::PATH => $path ], $key);
+			$this->update([ File::PATH => $this->ensure_path_is_relative($update_path) ], $key);
 		}
 
 		return $key;
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	public function delete($key)
 	{
 		$path = $this->select('path')->filter_by_nid($key)->rc;
@@ -164,39 +229,5 @@ class FileModel extends NodeModel
 		}
 
 		return $rc;
-	}
-
-	static protected function make_path($key, $title, $path, $mime, $extension = null)
-	{
-		$base = dirname($mime);
-
-		if ($base == 'application')
-		{
-			$base = basename($mime);
-		}
-
-		if (!in_array($base, [ 'image', 'audio', 'pdf', 'zip' ]))
-		{
-			$base = 'bin';
-		}
-
-		$rc = \ICanBoogie\strip_root(\ICanBoogie\REPOSITORY . 'files')
-		. '/' . $base . '/' . ($key ?: uniqid()) . '-' . \ICanBoogie\normalize($title);
-
-		#
-		# append extension
-		#
-
-		if (!$extension)
-		{
-			$extension = pathinfo($path, PATHINFO_EXTENSION) ?: 'file';
-
-			if ($extension)
-			{
-				$extension = '.' . $extension;
-			}
-		}
-
-		return $rc . $extension;
 	}
 }
