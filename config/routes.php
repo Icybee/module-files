@@ -23,7 +23,7 @@ return [
 
 	'api:files:show' => [
 
-		'pattern' => '/api/files/<uuid:[0-9a-z\-]{36}>',
+		'pattern' => '/api/files/<uuid:{:uuid:}>',
 		'controller' => ShowOperation::class,
 		'via' => Request::METHOD_GET
 
@@ -31,7 +31,7 @@ return [
 
 	'api:files:download' => [
 
-		'pattern' => '/api/files/<uuid:[0-9a-z\-]{36}>/download',
+		'pattern' => '/api/files/<uuid:{:uuid:}>/download',
 		'controller' => DownloadOperation::class,
 		'via' => Request::METHOD_GET
 
@@ -55,7 +55,7 @@ return [
 
 	'files:show' => [
 
-		'pattern' => '/files/<uuid:[0-9a-z\-]{36}>',
+		'pattern' => '/files/<uuid:{:uuid:}><extension:[\.a-z]*>',
 		'controller' => Routing\FilesController::class . '#show',
 		'via' => Request::METHOD_GET
 
@@ -63,9 +63,23 @@ return [
 
 	'files:download' => [
 
-		'pattern' => '/files/<uuid:[0-9a-z\-]{36}>/download',
+		'pattern' => '/files/download/<uuid:{:uuid:}><extension:[\.a-z]*>',
 		'controller' => Routing\FilesController::class . '#download',
 		'via' => Request::METHOD_GET
+
+	],
+
+	'files:protected:show' => [
+
+		'pattern' => '/files/<nid:\d+><extension:[\.a-z]*>',
+		'controller' => Routing\FilesAdminController::class . '#show'
+
+	],
+
+	'files:protected:download' => [
+
+		'pattern' => '/files/download/<nid:\d+><extension:[\.a-z]*>',
+		'controller' => Routing\FilesAdminController::class . '#download'
 
 	]
 

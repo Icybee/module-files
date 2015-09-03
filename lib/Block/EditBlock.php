@@ -21,6 +21,9 @@ use Brickrouge\Form;
 use Icybee\Modules\Files as Root;
 use Icybee\Modules\Files\File;
 
+/**
+ * @property File $record
+ */
 class EditBlock extends \Icybee\Modules\Nodes\Block\EditBlock
 {
 	const ACCEPT = '#files-accept';
@@ -66,6 +69,11 @@ class EditBlock extends \Icybee\Modules\Nodes\Block\EditBlock
 		$properties = $this->values;
 		$nid = $properties[File::NID];
 		$path = \ICanBoogie\strip_root($properties[File::PATH]);
+
+		if (!$path && $this->record)
+		{
+			$path = $this->record->path->relative;
+		}
 
 		$this->attributes = \ICanBoogie\array_merge_recursive($this->attributes, [
 

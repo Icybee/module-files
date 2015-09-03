@@ -118,8 +118,8 @@ class ShowOperation extends Operation
 	{
 		/* @var $record File */
 		$record = $this->record;
-		$pathname = \ICanBoogie\DOCUMENT_ROOT . $record->path;
-		$hash = sha1_file($pathname);
+		$pathname = $record->pathname;
+		$hash = $pathname->hash;
 		$modified_time = filemtime($pathname);
 
 		$response = $this->response;

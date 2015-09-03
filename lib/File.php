@@ -11,37 +11,34 @@
 
 namespace Icybee\Modules\Files;
 
+use ICanBoogie\HTTP\File as HTTPFile;
+
+use Icybee\Binding\Core\PrototypedBindings;
+use Icybee\Modules\Files\Storage\Pathname;
 use Icybee\Modules\Nodes\Node;
 
 /**
  * Representation of a managed file.
  *
- * @property-read string $extension The file extension. If any, the extension includes the dot,
- * e.g. ".zip".
+ * @property-read \ICanBoogie\Core|\Icybee\Binding\Core\CoreBindings|Binding\CoreBindings $app
+ * @property-read Pathname $pathname Absolute path to the file.
  */
 class File extends Node
 {
+	use PrototypedBindings;
+
 	const MODEL_ID = 'files';
 
-	const PATH = 'path';
 	const MIME = 'mime';
 	const SIZE = 'size';
+	const EXTENSION = 'extension';
 	const DESCRIPTION = 'description';
 	const HTTP_FILE = 'file';
 
 	/**
-	 * Path of the file, relative to the DOCUMENT_ROOT.
-	 *
-	 * @var string
+	 * @deprecated
 	 */
-	public $path;
-
-	/**
-	 * MIME type of the file.
-	 *
-	 * @var string
-	 */
-	public $mime;
+	const PATH = 'path';
 
 	/**
 	 * Size of the file.
@@ -51,6 +48,20 @@ class File extends Node
 	public $size;
 
 	/**
+	 * MIME type of the file.
+	 *
+	 * @var string
+	 */
+	public $mime;
+
+	/**
+	 * File extension, including the dot ".".
+	 *
+	 * @var string
+	 */
+	public $extension = '';
+
+	/**
 	 * Description of the file.
 	 *
 	 * @var string
@@ -58,59 +69,77 @@ class File extends Node
 	public $description = '';
 
 	/**
-	 * If {@link HTTP_FILE} is defined, the {@link \ICanBoogie\HTTP\File} instance is used to
-	 * set the {@link $mime} and {@link $size} properties, as well as the {@link $title} property
-	 * if it is empty.
+	 * @return Pathname|null
+	 */
+	protected function get_pathname()
+	{
+		return $this->app->file_storage->find($this->uuid);
+	}
+
+	/**
+	 * If {@link HTTP_FILE} is defined, the {@link HTTPFile} instance is used to
+	 * set the {@link $mime}, {@link $size} and {@link $extension} properties.
+	 * The {@link $title} property is updated as well if it is empty.
 	 *
-	 * After the record is saved, the {@link HTTP_FILE} property is removed. Also, the
-	 * {@link $path} property is updated.
+	 * After the record is saved, the {@link HTTP_FILE} property is removed.
 	 */
 	public function save()
 	{
+		/* @var $file HTTPFile */
+
+		$file = null;
+
 		if (isset($this->{ self::HTTP_FILE }))
 		{
-			/* @var $file \ICanBoogie\HTTP\File */
-
 			$file = $this->{ self::HTTP_FILE };
-
-			$this->mime = $file->type;
-			$this->size = $file->size;
-
-			if (!$this->title)
-			{
-				$this->title = $file->unsuffixed_name;
-			}
+			$this->save_file_begin($file);
 		}
 
 		$rc = parent::save();
 
-		unset($this->{ self::HTTP_FILE });
-
-		if ($rc)
+		if ($rc && $file)
 		{
-			$this->path = $this->model->select(self::PATH)->filter_by_nid($rc)->rc;
+			unset($this->{ self::HTTP_FILE });
+
+			$this->save_file_end($file);
 		}
 
 		return $rc;
 	}
 
 	/**
-	 * Returns the extension of the file.
+	 * Begins saving the HTTP file.
 	 *
-	 * Note: The dot is included e.g. ".zip".
-	 *
-	 * @return string
+	 * @param HTTPFile $file
 	 */
-	protected function get_extension()
+	protected function save_file_begin(HTTPFile $file)
 	{
-		$extension = pathinfo($this->path, PATHINFO_EXTENSION);
+		$this->mime = $file->type;
+		$this->size = $file->size;
+		$this->extension = $file->extension;
 
-		if (!$extension)
+		if (!$this->title)
 		{
-			return '';
+			$this->title = $file->unsuffixed_name;
+		}
+	}
+
+	/**
+	 * Finishes saving the HTTP file.
+	 *
+	 * @param HTTPFile $file
+	 */
+	protected function save_file_end(HTTPFile $file)
+	{
+		$storage = $this->app->file_storage;
+		$pathname = $storage->create_pathname($file->pathname);
+
+		if (!file_exists($pathname))
+		{
+			$file->move($pathname);
 		}
 
-		return '.' . $extension;
+		$storage->index($this->nid, $this->uuid, $pathname->hash);
 	}
 
 	public function url($type = 'view')

@@ -50,12 +50,11 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 	protected $accept;
 
 	/**
+	 * Unset {@link File::MIME}, {@link File::SIZE}, and {@link File::EXTENSION} properties because
+	 * they can only be set from a HTTP file. {@link File::DESCRIPTION} is set to and empty
+	 * string if it is not defined.
+	 *
 	 * {@inheritdoc}
-	 *
-	 * Unset {@link File::PATH} because only {@link File::HTTP_FILE} can be used to update it.
-	 * {@link File::HTTP_FILE} is updated if {@link $file} is not empty.
-	 *
-	 * Also, {@link File::DESCRIPTION} is set to and empty string if it is not defined.
 	 */
 	protected function lazy_get_properties()
 	{
@@ -65,7 +64,9 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 
 		];
 
-		unset($properties[File::PATH]);
+		unset($properties[File::MIME]);
+		unset($properties[File::SIZE]);
+		unset($properties[File::EXTENSION]);
 
 		if ($this->file)
 		{
@@ -104,17 +105,12 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 	protected function control(array $controls)
 	{
 		$request = $this->request;
-
 		$path = $request[File::PATH];
-		$file = null;
-
-		/* @var $file \ICanBoogie\HTTP\File */
-
 		$file = $request->files[self::USERFILE];
 
 		if ($file && $file->is_valid)
 		{
-			$filename = \ICanBoogie\generate_v4_uuid() . $file->extension;
+			$filename = \ICanBoogie\generate_v4_uuid();
 			$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . $filename;
 
 			$file->move($pathname);
@@ -125,13 +121,11 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 
 			if (!$file)
 			{
-				$this->response->errors[File::PATH] = $this->response->errors->format("Invalid or delete file: %pathname", [ 'pathname' => $path ]);
+				$this->response->errors[File::PATH]->add("Invalid or deleted file: %pathname", [ 'pathname' => $path ]);
 			}
 		}
 
 		unset($request[File::PATH]);
-		unset($request[File::MIME]);
-		unset($request[File::SIZE]);
 
 		$this->file = $file;
 
@@ -174,7 +168,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 
 			if ($error_message)
 			{
-				$errors[File::PATH] = $errors->format('Unable to upload file %file: :message.', [
+				$errors[File::PATH]->add('Unable to upload file %file: :message.', [
 
 					'%file' => $file->name,
 					':message' => $error_message
@@ -184,7 +178,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 		}
 		else if (!$this->key)
 		{
-			$errors[File::PATH] = $errors->format("File is required.");
+			$errors[File::PATH]->add("File is required.");
 		}
 
 		return parent::validate($errors);
@@ -204,10 +198,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 
 		if ($oldpath)
 		{
-			$newpath = $this->module->model
-			->select('path')
-			->filter_by_nid($rc['key'])
-			->rc;
+			$newpath = $this->record->path;
 
 			if ($oldpath != $newpath)
 			{

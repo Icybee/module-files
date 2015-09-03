@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Icybee package.
+ *
+ * (c) Olivier Laviale <olivier.laviale@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Icybee\Modules\Files;
 
 use ICanBoogie\ActiveRecord\Model;
@@ -18,9 +27,9 @@ return [
 			Model::EXTENDING => 'nodes',
 			Model::SCHEMA => [
 
-				'path' => 'varchar',
-				'mime' => 'varchar',
 				'size' => [ 'integer', 'unsigned' => true ],
+				'mime' => [ 'varchar', 'charset' => 'ascii/general_ci' ],
+				'extension' => [ 'varchar', 16, 'charset' => 'ascii/general_ci' ],
 				'description' => 'text'
 
 			]

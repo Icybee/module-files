@@ -11,9 +11,13 @@
 
 namespace Icybee\Modules\Files;
 
-use Icybee\Modules\Nodes\NodeModel;
+use ICanBoogie;
 
-class FileModel extends NodeModel
-{
+$hooks = Hooks::class . '::';
 
-}
+return [
+
+	ICanBoogie\Core::class . '::lazy_get_file_storage_index' => $hooks . 'get_file_storage_index',
+	ICanBoogie\Core::class . '::lazy_get_file_storage' => $hooks . 'get_file_storage'
+
+];
