@@ -81,7 +81,7 @@ class UploadOperation extends Operation
 
 		if (!$file)
 		{
-			$errors[SaveOperation::USERFILE] = $errors->format("No file was uploaded.");
+			$errors->add(SaveOperation::USERFILE, "No file was uploaded.");
 
 			return false;
 		}

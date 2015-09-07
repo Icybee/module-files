@@ -46,7 +46,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 			}
 			else
 			{
-				$errors[$this->id] = $errors->format('Unable to create %directory directory, its parent is not writtable.', [ '%directory' => $path ]);
+				$errors->add($this->id, "Unable to create %directory directory, its parent is not writable.", [ '%directory' => $path ]);
 			}
 		}
 
@@ -68,7 +68,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 			}
 			else
 			{
-				$errors[$this->id] = $errors->format('Unable to create %directory directory, its parent is not writtable', [ '%directory' => $path ]);
+				$errors->add($this->id, "Unable to create %directory directory, its parent is not writable", [ '%directory' => $path ]);
 			}
 		}
 
@@ -98,7 +98,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 
 		if (!is_dir($path))
 		{
-			$errors[$this->id] = $errors->format('The %directory directory is missing.', [ '%directory' => $path ]);
+			$errors->add($this->id, "The %directory directory is missing.", [ '%directory' => $path ]);
 		}
 
 		#
@@ -109,7 +109,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 
 		if (!is_dir($path))
 		{
-			$errors[$this->id] = $errors->format('The %directory directory is missing.', [ '%directory' => $path ]);
+			$errors->add($this->id, "The %directory directory is missing.", [ '%directory' => $path ]);
 		}
 
 		return parent::is_installed($errors);

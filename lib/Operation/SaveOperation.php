@@ -168,7 +168,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 
 			if ($error_message)
 			{
-				$errors[File::PATH]->add('Unable to upload file %file: :message.', [
+				$errors->add(File::PATH, "Unable to upload file %file: :message.", [
 
 					'%file' => $file->name,
 					':message' => $error_message
