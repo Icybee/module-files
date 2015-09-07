@@ -18,9 +18,11 @@ class Module extends \Icybee\Modules\Nodes\Module
 	const OPERATION_UPLOAD = 'upload';
 
 	/**
-	 * Overrides the method to create the "/repository/tmp/" and "/repository/files/" directories,
-	 * and add a ".htaccess" file in the "/repository/tmp/" directory which denies all access and
-	 * a ".htaccess" file in the "/repository/files/" directory which allows all access.
+	 * Creates following directories, with their .htaccess file.
+	 *
+	 * - "/repository/tmp", allow from all
+	 * - "/repository/files", allow from all
+	 * - "/repository/files-index", deny from all
 	 *
 	 * @inheritdoc
 	 */
@@ -69,6 +71,28 @@ class Module extends \Icybee\Modules\Nodes\Module
 			else
 			{
 				$errors->add($this->id, "Unable to create %directory directory, its parent is not writable", [ '%directory' => $path ]);
+			}
+		}
+
+		#
+		# $repository/files-index
+		#
+
+		$path = $repository . 'files-index';
+
+		if (!file_exists($path))
+		{
+			$parent = dirname($path);
+
+			if (is_writable($parent))
+			{
+				mkdir($path);
+
+				file_put_contents($path . DIRECTORY_SEPARATOR . '.htaccess', 'Deny from all');
+			}
+			else
+			{
+				$errors[$this->id]->add('Unable to create %directory directory, its parent is not writable', [ '%directory' => $path ]);
 			}
 		}
 
