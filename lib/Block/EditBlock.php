@@ -72,7 +72,7 @@ class EditBlock extends \Icybee\Modules\Nodes\Block\EditBlock
 
 		if (!$path && $this->record)
 		{
-			$path = $this->record->path->relative;
+			$path = $this->record->pathname->relative;
 		}
 
 		$this->attributes = \ICanBoogie\array_merge_recursive($this->attributes, [
