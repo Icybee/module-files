@@ -192,13 +192,13 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 	protected function process()
 	{
 		$record = $this->record;
-		$oldpath = $record ? $record->path : null;
+		$oldpath = $record ? $record->pathname->relative : null;
 
 		$rc = parent::process();
 
 		if ($oldpath)
 		{
-			$newpath = $this->record->path;
+			$newpath = $this->record->pathname->relative;
 
 			if ($oldpath != $newpath)
 			{
