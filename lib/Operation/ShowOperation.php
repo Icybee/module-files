@@ -155,36 +155,10 @@ class ShowOperation extends Operation
 		$response->content_length = $record->size;
 		$response->last_modified = $modified_time;
 
-		$fh = fopen($pathname, 'rb');
+		return function() use ($pathname) {
 
-		if (!$fh)
-		{
-			throw new \Exception("Unable to lock file.");
-		}
+			readfile($pathname);
 
-		return function() use ($fh)
-		{
-			#
-			# Reset time limit for big files
-			#
-
-			if (!ini_get('safe_mode'))
-			{
-				set_time_limit(0);
-			}
-
-			while (!feof($fh) && !connection_aborted())
-			{
-				echo fread($fh, 1024 * 8);
-
-				#
-				# flushing frees memory used by the PHP buffer
-				#
-
-				flush();
-			}
-
-			fclose($fh);
 		};
 	}
 }

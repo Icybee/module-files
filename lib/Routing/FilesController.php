@@ -36,7 +36,12 @@ class FilesController extends Controller
 			->routes['api:files:show']
 			->format([ 'uuid' => $uuid ]);
 
-		return Request::from($route)->send();
+		return Request::from([
+
+			'uri' => $route,
+			'headers' => $this->request->headers
+
+		])->send();
 	}
 
 	/**
@@ -50,6 +55,11 @@ class FilesController extends Controller
 			->routes['api:files:download']
 			->format([ 'uuid' => $uuid ]);
 
-		return Request::from($route)->send();
+		return Request::from([
+
+			'uri' => $route,
+			'headers' => $this->request->headers
+
+		])->send();
 	}
 }
