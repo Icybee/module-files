@@ -86,6 +86,13 @@ class Update20150902 extends Update
 		{
 			$path = $document_root . $path;
 
+			if (!file_exists($path))
+			{
+				echo "!! file $path does not exists.\n";
+
+				continue;
+			}
+
 			$hash = $storage->add($path)->hash;
 			$index->add(IndexKey::from([ $nid, $uuid, $hash ]));
 		}
