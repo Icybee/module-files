@@ -11,10 +11,15 @@
 
 namespace Icybee\Modules\Files\Routing;
 
+use ICanBoogie\HTTP\FileResponse;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Routing\Controller;
 use ICanBoogie\Binding\Routing\ControllerBindings;
 use ICanBoogie\Binding\Routing\ForwardUndefinedPropertiesToApplication;
+use ICanBoogie\Module\ControllerBindings as ModuleBindings;
+
+use Icybee\Modules\Files\Binding\CoreBindings;
+use Icybee\Modules\Files\File;
 
 /**
  * Files public controller.
@@ -22,44 +27,62 @@ use ICanBoogie\Binding\Routing\ForwardUndefinedPropertiesToApplication;
 class FilesController extends Controller
 {
 	use Controller\ActionTrait;
-	use ControllerBindings;
+	use ControllerBindings, CoreBindings, ModuleBindings;
 	use ForwardUndefinedPropertiesToApplication;
 
 	/**
 	 * @param string $uuid
 	 *
-	 * @return \ICanBoogie\HTTP\Response
+	 * @return FileResponse
 	 */
 	public function action_get_show($uuid)
 	{
-		$route = $this
-			->routes['api:files:show']
-			->format([ 'uuid' => $uuid ]);
+		$pathname = $this->file_storage->find($uuid);
 
-		return Request::from([
+		if (!$pathname)
+		{
+			return null;
+		}
 
-			'uri' => $route,
-			'headers' => $this->request->headers
+		return new FileResponse($pathname, $this->request, [
 
-		])->send();
+			FileResponse::OPTION_ETAG => $pathname->hash
+
+		]);
 	}
 
 	/**
 	 * @param string $uuid
 	 *
-	 * @return \ICanBoogie\HTTP\Response
+	 * @return FileResponse
 	 */
 	public function action_get_download($uuid)
 	{
-		$route = $this
-			->routes['api:files:download']
-			->format([ 'uuid' => $uuid ]);
+		$matches = $this->file_storage_index->find($uuid);
 
-		return Request::from([
+		if (!$matches)
+		{
+			return null;
+		}
 
-			'uri' => $route,
-			'headers' => $this->request->headers
+		$key = $matches[0];
+		$pathname = $this->file_storage->find($key);
 
-		])->send();
+		if (!$pathname)
+		{
+			return null;
+		}
+
+		/* @var $record File */
+
+		$record = $this->model[$key->nid];
+
+		return new FileResponse($pathname, $this->request, [
+
+			FileResponse::OPTION_ETAG => $pathname->hash,
+			FileResponse::OPTION_FILENAME => $record->title . $record->extension,
+			FileResponse::OPTION_MIME => $record->mime
+
+		]);
 	}
 }

@@ -11,8 +11,11 @@
 
 namespace Icybee\Modules\Files\Routing;
 
+use ICanBoogie\HTTP\FileResponse;
 use ICanBoogie\HTTP\Request;
 
+use Icybee\Modules\Files\Binding\CoreBindings;
+use Icybee\Modules\Files\File;
 use Icybee\Modules\Files\FileModel;
 use Icybee\Modules\Files\Module;
 use Icybee\Modules\Nodes\Routing\NodesAdminController;
@@ -22,6 +25,8 @@ use Icybee\Modules\Nodes\Routing\NodesAdminController;
  */
 class FilesAdminController extends NodesAdminController
 {
+	use CoreBindings;
+
 	protected function is_action_method($action)
 	{
 		if ($action === 'download')
@@ -34,23 +39,59 @@ class FilesAdminController extends NodesAdminController
 
 	protected function show($id)
 	{
-		/* @var $record \Icybee\Modules\Files\File */
+		/* @var $record File */
 
 		$record = $this->model[$id];
 
 		$this->assert_has_permission(Module::PERMISSION_ACCESS, $record);
 
-		return Request::from($this->app->url_for('api:files:show', $record))->send();
+		$pathname = $this->file_storage->find($id);
+
+		if (!$pathname)
+		{
+			return null;
+		}
+
+		return new FileResponse($pathname, $this->request, [
+
+			FileResponse::OPTION_ETAG => $pathname->hash
+
+		]);
 	}
 
 	protected function download($id)
 	{
-		/* @var $record \Icybee\Modules\Files\File */
+		/* @var $record File */
 
 		$record = $this->model[$id];
 
 		$this->assert_has_permission(Module::PERMISSION_ACCESS, $record);
 
-		return Request::from($this->app->url_for('api:files:download', $record))->send();
+		$matches = $this->file_storage_index->find($id);
+
+		if (!$matches)
+		{
+			return null;
+		}
+
+		$key = $matches[0];
+		$pathname = $this->file_storage->find($key);
+
+		if (!$pathname)
+		{
+			return null;
+		}
+
+		/* @var $record File */
+
+		$record = $this->model[$key->nid];
+
+		return new FileResponse($pathname, $this->request, [
+
+			FileResponse::OPTION_ETAG => $pathname->hash,
+			FileResponse::OPTION_FILENAME => $record->title . $record->extension,
+			FileResponse::OPTION_MIME => $record->mime
+
+		]);
 	}
 }
