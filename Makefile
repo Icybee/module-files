@@ -38,4 +38,6 @@ clean:
 	@rm -fR vendor
 	@rm -f composer.lock
 	@rm -Rf tests/repository/files
+	@rm -Rf tests/repository/files-index
 	@rm -Rf tests/repository/tmp
+	@rm -f tests/sandbox/*-*

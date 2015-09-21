@@ -13,10 +13,9 @@ namespace Icybee\Modules\Files;
 
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
+
 use Icybee\Modules\Files\Operation\SaveOperation;
 use Icybee\Modules\Users\User;
-
-// use Icybee\Modules\Files\SaveOperationTest\FakeSaveOperation;
 
 /* @var $response \ICanBoogie\Operation\Response */
 
@@ -84,9 +83,9 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 		{
 			$errors = $failure->operation->response->errors;
 
-			$this->assertNotNull($errors[File::PATH]);
-			$this->assertStringStartsWith("Unable to upload file", (string) $errors[File::PATH]);
-			$this->assertNotEmpty(strpos($errors[File::PATH], $message));
+			$this->assertNotNull($errors[File::HTTP_FILE]);
+			$this->assertStringStartsWith("Unable to upload file", (string) $errors[File::HTTP_FILE]);
+			$this->assertNotEmpty(strpos($errors[File::HTTP_FILE], $message));
 		}
 	}
 
@@ -122,7 +121,7 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 		{
 			$errors = $e->operation->response->errors;
 
-			$this->assertNotNull($errors[File::PATH]);
+			$this->assertNotNull($errors[File::HTTP_FILE]);
 		}
 	}
 
@@ -153,14 +152,13 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 
 		$record = $operation->record;
 		$this->assertInstanceOf('Icybee\Modules\Files\File', $record);
-		$this->assertStringStartsWith('/repository/files/bin/', $record->path);
 		$this->assertEquals(basename(__FILE__, '.php'), $record->title);
 		$this->assertEquals(filesize($source_pathname), $record->size);
 		$this->assertEquals('application/x-php', $record->mime);
 
 		# save again
 
-		$path = $record->path;
+		$path = $record->pathname;
 
 		$request = Request::from(\ICanBoogie\array_merge_recursive(self::$request_basic_properties, [
 
@@ -176,11 +174,11 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 		$response = $operation($request);
 
 		$this->assertTrue($response->status->is_successful);
-		$this->assertEquals($path, $record->path);
+		$this->assertEquals($path, $record->pathname);
 
 		# cleanup
 
 		$record->delete();
-		$this->assertFileNotExists(dirname(\ICanBoogie\REPOSITORY) . $record->path);
+		$this->assertFileNotExists((string) $record->pathname);
 	}
 }

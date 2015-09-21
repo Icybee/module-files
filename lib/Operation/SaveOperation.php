@@ -32,7 +32,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 	 *
 	 * @var string
 	 */
-	const USERFILE = 'path';
+	const USERFILE = File::HTTP_FILE;
 
 	/**
 	 * @var HTTPFile|bool The optional file to save with the record.
@@ -81,11 +81,11 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 	 *
 	 * The temporary files stored in the repository are cleaned before the operation is processed.
 	 */
-	public function __invoke(Request $request)
+	public function action(Request $request)
 	{
 		$this->module->clean_temporary_files();
 
-		return parent::__invoke($request);
+		return parent::action($request);
 	}
 
 	/**
@@ -105,7 +105,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 	protected function control(array $controls)
 	{
 		$request = $this->request;
-		$path = $request[File::PATH];
+		$path = $request[File::HTTP_FILE];
 		$file = $request->files[self::USERFILE];
 
 		if ($file && $file->is_valid)
@@ -121,11 +121,11 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 
 			if (!$file)
 			{
-				$this->response->errors[File::PATH]->add("Invalid or deleted file: %pathname", [ 'pathname' => $path ]);
+				$this->response->errors->add(File::HTTP_FILE, "Invalid or deleted file: %pathname", [ 'pathname' => $path ]);
 			}
 		}
 
-		unset($request[File::PATH]);
+		unset($request[File::HTTP_FILE]);
 
 		$this->file = $file;
 
@@ -135,7 +135,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 			# This is used during form validation.
 			#
 
-			$request[File::PATH] = $file->pathname;
+			$request[File::HTTP_FILE] = $file->pathname;
 		}
 
 		return parent::control($controls);
@@ -168,7 +168,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 
 			if ($error_message)
 			{
-				$errors->add(File::PATH, "Unable to upload file %file: :message.", [
+				$errors->add(File::HTTP_FILE, "Unable to upload file %file: :message.", [
 
 					'%file' => $file->name,
 					':message' => $error_message
@@ -178,7 +178,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 		}
 		else if (!$this->key)
 		{
-			$errors[File::PATH]->add("File is required.");
+			$errors->add(File::HTTP_FILE, "File is required.");
 		}
 
 		return parent::validate($errors);

@@ -45,7 +45,7 @@ class EditBlock extends \Icybee\Modules\Nodes\Block\EditBlock
 		return parent::lazy_get_values() + [
 
 			File::NID => null,
-			File::PATH => null
+			File::HTTP_FILE => null
 
 		];
 	}
@@ -68,7 +68,7 @@ class EditBlock extends \Icybee\Modules\Nodes\Block\EditBlock
 
 		$properties = $this->values;
 		$nid = $properties[File::NID];
-		$path = \ICanBoogie\strip_root($properties[File::PATH]);
+		$path = \ICanBoogie\strip_root($properties[File::HTTP_FILE]);
 
 		if (!$path && $this->record)
 		{
@@ -79,13 +79,13 @@ class EditBlock extends \Icybee\Modules\Nodes\Block\EditBlock
 
 			Form::HIDDENS => [
 
-				File::PATH => $path
+				File::HTTP_FILE => $path
 
 			],
 
 			Form::VALUES => [
 
-				File::PATH => $path
+				File::HTTP_FILE => $path
 
 			]
 
@@ -102,7 +102,7 @@ class EditBlock extends \Icybee\Modules\Nodes\Block\EditBlock
 
 		return array_merge(parent::lazy_get_children(), [
 
-			File::PATH => new $uploader_class([
+			File::HTTP_FILE => new $uploader_class([
 
 				Form::LABEL => 'file',
 				Element::REQUIRED => empty($nid),

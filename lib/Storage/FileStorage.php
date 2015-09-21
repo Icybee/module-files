@@ -47,6 +47,11 @@ class FileStorage
 	 */
 	public function __construct($root, FileStorageIndex $index)
 	{
+		if (!$root)
+		{
+			throw new \InvalidArgumentException("`\$root` parameter cannot be empty.");
+		}
+
 		$this->root = rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 		$this->index = $index;
 	}

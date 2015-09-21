@@ -92,7 +92,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 			}
 			else
 			{
-				$errors[$this->id]->add('Unable to create %directory directory, its parent is not writable', [ '%directory' => $path ]);
+				$errors->add($this->id, 'Unable to create %directory directory, its parent is not writable', [ '%directory' => $path ]);
 			}
 		}
 

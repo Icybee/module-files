@@ -12,10 +12,10 @@ class FakeUploadOperation extends \Icybee\Modules\Files\Operation\UploadOperatio
 	/**
 	 * @inheritdoc
 	 */
-	public function __invoke(Request $request)
+	public function action(Request $request)
 	{
 		$this->module = $this->app->modules['files'];
 
-		return parent::__invoke($request);
+		return parent::action($request);
 	}
 }

@@ -1,8 +1,3 @@
-.buildpath
-.project
-.settings
-.README.md.html
 composer.lock
 docs
-tests/repository
 vendor

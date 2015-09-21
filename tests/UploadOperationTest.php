@@ -174,7 +174,7 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 
 			'request_params' => [
 
-				'path' => $rc['pathname']
+				File::HTTP_FILE => $rc['pathname']
 
 			]
 
@@ -188,7 +188,7 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 		$record = $operation->record;
 		$file = $operation->file;
 
-		$this->assertStringEndsWith($file->extension, $record->path);
+		$this->assertEquals($file->extension, $record->extension);
 		$this->assertEquals($file->type, $record->mime);
 		$this->assertEquals($file->size, $record->size);
 		$this->assertEquals($file->unsuffixed_name, $record->title);

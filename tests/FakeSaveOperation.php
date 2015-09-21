@@ -9,11 +9,11 @@ use ICanBoogie\HTTP\Request;
  */
 class FakeSaveOperation extends Operation\SaveOperation
 {
-	public function __invoke(Request $request)
+	public function action(Request $request)
 	{
 		$this->module = $this->app->modules['files'];
 
-		return parent::__invoke($request);
+		return parent::action($request);
 	}
 
 	protected function get_controls()

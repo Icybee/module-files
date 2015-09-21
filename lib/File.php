@@ -21,6 +21,7 @@ use Icybee\Modules\Nodes\Node;
  * Representation of a managed file.
  *
  * @property-read \ICanBoogie\Core|\Icybee\Binding\Core\CoreBindings|Binding\CoreBindings $app
+ * @property-read Storage\FileStorage $file_storage
  * @property-read Pathname $pathname Absolute path to the file.
  */
 class File extends Node
@@ -34,11 +35,6 @@ class File extends Node
 	const EXTENSION = 'extension';
 	const DESCRIPTION = 'description';
 	const HTTP_FILE = 'file';
-
-	/**
-	 * @deprecated
-	 */
-	const PATH = 'path';
 
 	/**
 	 * Size of the file.
@@ -73,7 +69,15 @@ class File extends Node
 	 */
 	protected function get_pathname()
 	{
-		return $this->app->file_storage->find($this->uuid);
+		return $this->file_storage->find($this->uuid);
+	}
+
+	/**
+	 * @return Storage\FileStorage
+	 */
+	protected function get_file_storage()
+	{
+		return $this->app->file_storage;
 	}
 
 	/**
@@ -92,7 +96,7 @@ class File extends Node
 		if (isset($this->{ self::HTTP_FILE }))
 		{
 			$file = $this->{ self::HTTP_FILE };
-			$this->save_file_begin($file);
+			$this->save_file_before($file);
 		}
 
 		$rc = parent::save();
@@ -101,7 +105,7 @@ class File extends Node
 		{
 			unset($this->{ self::HTTP_FILE });
 
-			$this->save_file_end($file);
+			$this->save_file_after($file);
 		}
 
 		return $rc;
@@ -112,7 +116,7 @@ class File extends Node
 	 *
 	 * @param HTTPFile $file
 	 */
-	protected function save_file_begin(HTTPFile $file)
+	protected function save_file_before(HTTPFile $file)
 	{
 		$this->mime = $file->type;
 		$this->size = $file->size;
@@ -129,9 +133,9 @@ class File extends Node
 	 *
 	 * @param HTTPFile $file
 	 */
-	protected function save_file_end(HTTPFile $file)
+	protected function save_file_after(HTTPFile $file)
 	{
-		$storage = $this->app->file_storage;
+		$storage = $this->file_storage;
 		$pathname = $storage->create_pathname($file->pathname);
 
 		if (!file_exists($pathname))
@@ -142,6 +146,13 @@ class File extends Node
 		$storage->index($this->nid, $this->uuid, $pathname->hash);
 	}
 
+	/**
+	 * Returns a URL for this record.
+	 *
+	 * @param string $type
+	 *
+	 * @return \ICanBoogie\Routing\FormattedRoute|string
+	 */
 	public function url($type = 'view')
 	{
 		$routes = $this->app->routes;

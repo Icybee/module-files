@@ -20,6 +20,13 @@
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./lib</directory>
+            <exclude>
+                <directory suffix=".php">./lib/Block</directory>
+                <directory suffix=".php">./lib/Routing</directory>
+                <directory suffix=".php">./vendor</directory>
+                <file>./lib/FileUpload.php</file>
+                <file>./lib/Operation/ConfigOperation.php</file>
+            </exclude>
         </whitelist>
     </filter>
 </phpunit>

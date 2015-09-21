@@ -17,6 +17,7 @@ use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
 
 use Icybee\Binding\Core\PrototypedBindings;
+use Icybee\Modules\Files\File;
 use Icybee\Modules\Files\Module;
 
 /**
@@ -57,11 +58,11 @@ class UploadOperation extends Operation
 		] + parent::get_controls();
 	}
 
-	public function __invoke(Request $request)
+	public function action(Request $request)
 	{
 		$this->module->clean_temporary_files();
 
-		return parent::__invoke($request);
+		return parent::action($request);
 	}
 
 	/**
@@ -77,7 +78,7 @@ class UploadOperation extends Operation
 
 		$_SERVER['HTTP_ACCEPT'] = 'application/json';
 
-		$this->file = $file = $this->request->files['path'];
+		$this->file = $file = $this->request->files[File::HTTP_FILE];
 
 		if (!$file)
 		{
@@ -102,7 +103,7 @@ class UploadOperation extends Operation
 
 		if ($error_message)
 		{
-			$errors['path'] = $error_message;
+			$errors[File::HTTP_FILE] = $error_message;
 		}
 
 		return true;

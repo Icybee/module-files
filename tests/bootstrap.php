@@ -31,7 +31,7 @@ $autoload->addPsr4('Icybee\Modules\Files\\', __DIR__);
  *
  * @return File
  */
-function create_file($src, array $attributes=[])
+function create_file_record($src, array $attributes=[])
 {
 	$app = \ICanBoogie\app();
 
@@ -71,6 +71,19 @@ function create_file($src, array $attributes=[])
 	return $operation->record;
 }
 
+/**
+ * @return string
+ */
+function create_file()
+{
+	$filename = \ICanBoogie\generate_v4_uuid();
+	$pathname = __DIR__ . DIRECTORY_SEPARATOR . 'sandbox' . DIRECTORY_SEPARATOR . $filename;
+
+	file_put_contents($pathname, openssl_random_pseudo_bytes(10000));
+
+	return $pathname;
+}
+
 /* @var $app Core|\ICanBoogie\Module\CoreBindings|\Icybee\Modules\Sites\Binding\CoreBindings */
 
 $app = new Core(\ICanBoogie\array_merge_recursive(\ICanBoogie\get_autoconfig(), [
@@ -85,7 +98,10 @@ $app = new Core(\ICanBoogie\array_merge_recursive(\ICanBoogie\get_autoconfig(), 
 
 		realpath(__DIR__ . '/../')
 
-	]
+	],
+
+	'error_handler' => null,
+	'exception_handler' => null
 
 ]));
 
