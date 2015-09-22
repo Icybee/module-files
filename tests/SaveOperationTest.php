@@ -11,6 +11,7 @@
 
 namespace Icybee\Modules\Files;
 
+use ICanBoogie\HTTP\File as HTTPFile;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
 
@@ -127,16 +128,16 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 
 	public function test_successful()
 	{
-		$source_pathname = __FILE__;
-		$pathname = DIR . 'tests/sandbox/' . basename(__FILE__);
-
-		copy($source_pathname, $pathname);
+		$extension = '.php';
+		$pathname = __DIR__ . '/sandbox/' . \ICanBoogie\generate_v4_uuid() . $extension;
+		copy(__FILE__, $pathname);
+		$size = filesize($pathname);
 
 		$request = Request::from(self::$request_basic_properties + [
 
 			'files' => [
 
-				SaveOperation::USERFILE => [ 'pathname' => $pathname ]
+				File::HTTP_FILE => [ 'pathname' => $pathname ]
 
 			]
 
@@ -146,14 +147,15 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 		$response = $operation($request);
 
 		$this->assertTrue($response->status->is_successful);
-		$this->assertInstanceOf('ICanBoogie\HTTP\File', $operation->file);
+		$this->assertInstanceOf(HTTPFile::class, $operation->file);
+		$this->assertFileNotExists($pathname);
 
 		/* @var $record File */
 
 		$record = $operation->record;
-		$this->assertInstanceOf('Icybee\Modules\Files\File', $record);
-		$this->assertEquals(basename(__FILE__, '.php'), $record->title);
-		$this->assertEquals(filesize($source_pathname), $record->size);
+		$this->assertInstanceOf(File::class, $record);
+		$this->assertEquals(basename($pathname, $extension), $record->title);
+		$this->assertEquals($size, $record->size);
 		$this->assertEquals('application/x-php', $record->mime);
 
 		# save again

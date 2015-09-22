@@ -72,11 +72,13 @@ function create_file_record($src, array $attributes=[])
 }
 
 /**
+ * @param string $extension
+ *
  * @return string
  */
-function create_file()
+function create_file($extension = '')
 {
-	$filename = \ICanBoogie\generate_v4_uuid();
+	$filename = \ICanBoogie\generate_v4_uuid() . $extension;
 	$pathname = __DIR__ . DIRECTORY_SEPARATOR . 'sandbox' . DIRECTORY_SEPARATOR . $filename;
 
 	file_put_contents($pathname, openssl_random_pseudo_bytes(10000));

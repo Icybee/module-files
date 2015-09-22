@@ -101,6 +101,38 @@ class FileStorage
 	}
 
 	/**
+	 * Releases a reference to a file.
+	 *
+	 * If a file has no reference left it is deleted.
+	 *
+	 * @param $key_or_nid_or_uuid_or_hash
+	 */
+	public function release($key_or_nid_or_uuid_or_hash)
+	{
+		$index = $this->index;
+		$matches = $index->find($key_or_nid_or_uuid_or_hash);
+
+		foreach ($matches as $key)
+		{
+			$index->delete($key);
+		}
+
+		foreach ($matches as $key)
+		{
+			$hash = $key->hash;
+
+			if ($index->find($hash))
+			{
+				continue;
+			}
+
+			$pathname = $this->find_by_hash($hash);
+
+			unlink($pathname);
+		}
+	}
+
+	/**
 	 * Finds a file.
 	 *
 	 * @param IndexKey|int|string $key_or_nid_or_uuid_or_hash

@@ -111,6 +111,18 @@ class File extends Node
 		return $rc;
 	}
 
+	public function delete()
+	{
+		$rc = parent::delete();
+
+		if ($rc)
+		{
+			$this->file_storage->release($this->uuid);
+		}
+
+		return $rc;
+	}
+
 	/**
 	 * Begins saving the HTTP file.
 	 *
