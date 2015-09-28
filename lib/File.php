@@ -69,7 +69,19 @@ class File extends Node
 	 */
 	protected function get_pathname()
 	{
-		return $this->file_storage->find($this->uuid);
+		if (!$this->nid && !$this->uuid)
+		{
+			return null;
+		}
+
+		$pathname = $this->file_storage->find($this->uuid);
+
+		if (!$pathname)
+		{
+			throw new \LogicException("Unable to retrieve pathname for {$this->uuid}.");
+		}
+
+		return $pathname;
 	}
 
 	/**

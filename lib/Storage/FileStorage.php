@@ -105,12 +105,12 @@ class FileStorage
 	 *
 	 * If a file has no reference left it is deleted.
 	 *
-	 * @param $key_or_nid_or_uuid_or_hash
+	 * @param $key_or_id_or_uuid_or_hash
 	 */
-	public function release($key_or_nid_or_uuid_or_hash)
+	public function release($key_or_id_or_uuid_or_hash)
 	{
 		$index = $this->index;
-		$matches = $index->find($key_or_nid_or_uuid_or_hash);
+		$matches = $index->find($key_or_id_or_uuid_or_hash);
 
 		foreach ($matches as $key)
 		{

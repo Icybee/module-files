@@ -19,6 +19,10 @@ autoload: vendor
 	@$(COMPOSER_ENV) composer dump-autoload
 
 test: vendor
+	@rm -Rf tests/repository/files
+	@rm -Rf tests/repository/files-index
+	@rm -Rf tests/repository/tmp
+	@rm  -f tests/sandbox/*-*
 	@phpunit
 
 test-coverage: vendor
@@ -36,8 +40,8 @@ doc: vendor
 clean:
 	@rm -fR build
 	@rm -fR vendor
-	@rm -f composer.lock
+	@rm  -f composer.lock
 	@rm -Rf tests/repository/files
 	@rm -Rf tests/repository/files-index
 	@rm -Rf tests/repository/tmp
-	@rm -f tests/sandbox/*-*
+	@rm  -f tests/sandbox/*-*

@@ -16,17 +16,19 @@ use ICanBoogie\Accessor\AccessorTrait;
 /**
  * Representation of an index key.
  *
- * @property-read int $nid Record identifier.
- * @property-read string $formatted_nid `$nid` formatted as a composite part.
+ * @property-read int $id Record identifier.
  * @property-read string $uuid Record v4 UUID.
  * @property-read string $hash A hash from {@link Pathname::hash()}
+ * @property-read string $encoded_id Encoded `$id`.
+ * @property-read string $encoded_uuid Encoded `uuid`.
  */
 class IndexKey
 {
 	use AccessorTrait;
 
-	const HEXNID_LENGTH = 16;
 	const UUID_LENGTH = 36;
+	const ENCODED_ID_LENGTH = 16;
+	const ENCODED_UUID_LENGTH = 22;
 	const HASH_LENGTH = Pathname::HASH_LENGTH;
 
 	/**
@@ -44,11 +46,12 @@ class IndexKey
 	static public function from($composite_or_array)
 	{
 		$composite = $composite_or_array;
-		$array = $composite_or_array;
 
 		if (is_array($composite_or_array))
 		{
-			$composite = self::format_key($composite_or_array[0], $composite_or_array[1], $composite_or_array[2]);
+			list($id, $uuid, $hash) = $composite_or_array;
+
+			return static::from(self::format_key(self::encode_id($id), self::encode_uuid($uuid), $hash));
 		}
 
 		if (isset(self::$instances[$composite]))
@@ -56,12 +59,9 @@ class IndexKey
 			return self::$instances[$composite];
 		}
 
-		if (is_string($composite_or_array))
-		{
-			$array = self::parse_key($composite);
-		}
+		list($encoded_id, $encoded_uuid, $hash) = self::parse_key($composite);
 
-		return self::$instances[$composite] = new static($array[0], $array[1], $array[2]);
+		return self::$instances[$composite] = new static($encoded_id, $encoded_uuid, $hash);
 	}
 
 	/**
@@ -73,64 +73,111 @@ class IndexKey
 	 */
 	static private function parse_key($key)
 	{
-		$nid = hexdec(substr($key, 0, self::HEXNID_LENGTH));
-		$uuid = substr($key, self::HEXNID_LENGTH + 1, self::UUID_LENGTH);
-		$hash = substr($key, self::HEXNID_LENGTH + 1 + self::UUID_LENGTH + 1);
+		$encoded_id = substr($key, 0, self::ENCODED_ID_LENGTH);
+		$encoded_uuid = substr($key, self::ENCODED_ID_LENGTH + 1, self::ENCODED_UUID_LENGTH);
+		$hash = substr($key, self::ENCODED_ID_LENGTH + 1 + self::ENCODED_UUID_LENGTH + 1);
 
-		return [ $nid, $uuid, $hash ];
+		return [ $encoded_id, $encoded_uuid, $hash ];
 	}
 
 	/**
 	 * Formats a composite key.
 	 *
-	 * @param int $nid
-	 * @param string $uuid
+	 * @param string $encoded_id
+	 * @param string $encoded_uuid
 	 * @param string $hash
 	 *
 	 * @return string
 	 */
-	static private function format_key($nid, $uuid, $hash)
+	static private function format_key($encoded_id, $encoded_uuid, $hash)
 	{
-		$formatted_nid = self::format_nid($nid);
-
-		return "{$formatted_nid}-{$uuid}-{$hash}";
+		return "{$encoded_id}-{$encoded_uuid}-{$hash}";
 	}
 
 	/**
-	 * Formats a node identifier has a composite part.
+	 * Encodes identifier as a key part.
 	 *
-	 * @param int $nid
+	 * @param int $id
 	 *
 	 * @return string
 	 */
-	static public function format_nid($nid)
+	static public function encode_id($id)
 	{
-		return sprintf('%0' . self::HEXNID_LENGTH . 'x', $nid);
+		return sprintf('%0' . self::ENCODED_ID_LENGTH . 'x', $id);
+	}
+
+	/**
+	 * Decodes identifier encoded by {@link self::encode_id()}.
+	 *
+	 * @param string $encoded_id
+	 *
+	 * @return number
+	 */
+	static public function decode_id($encoded_id)
+	{
+		return hexdec($encoded_id);
+	}
+
+	/**
+	 * Encodes a UUID as a key part.
+	 *
+	 * @param $uuid
+	 *
+	 * @return string
+	 */
+	static public function encode_uuid($uuid)
+	{
+		if (preg_match('/[^0-9a-f\-]/', $uuid))
+		{
+			throw new \LogicException("Invalid UUID: $uuid.");
+		}
+
+		return Base64::encode_unpadded(hex2bin(strtr($uuid, [ '-' => '' ])));
+	}
+
+	/**
+	 * Decodes UUID encoded by {@link self::encode_uuid()}.
+	 *
+	 * @param string $encoded_uuid
+	 *
+	 * @return string
+	 */
+	static public function decode_uuid($encoded_uuid)
+	{
+		$data = Base64::decode_unpadded($encoded_uuid);
+		$data = bin2hex($data);
+
+		return implode('-', str_split($data, 4));
 	}
 
 	/**
 	 * @var int
 	 */
-	private $nid;
+	private $encoded_id;
 
-	protected function get_nid()
+	protected function get_encoded_id()
 	{
-		return $this->nid;
+		return $this->encoded_id;
 	}
 
-	protected function get_formatted_nid()
+	protected function get_id()
 	{
-		return self::format_nid($this->nid);
+		return self::decode_id($this->encoded_id);
 	}
 
 	/**
 	 * @var string
 	 */
-	private $uuid;
+	private $encoded_uuid;
+
+	protected function get_encoded_uuid()
+	{
+		return $this->encoded_uuid;
+	}
 
 	protected function get_uuid()
 	{
-		return $this->uuid;
+		return self::decode_uuid($this->encoded_uuid);
 	}
 
 	/**
@@ -144,14 +191,14 @@ class IndexKey
 	}
 
 	/**
-	 * @param int $nid
-	 * @param string $uuid
-	 * @param string $hash
+	 * @param string $encoded_id An encoded identifier as returned by {@link self::encode_id()}
+	 * @param string $encoded_uuid A UUID as encoded by {@link self::encode_uid()}
+	 * @param string $hash A hash as returned by {@link Pathname::hash()}
 	 */
-	public function __construct($nid, $uuid, $hash)
+	private function __construct($encoded_id, $encoded_uuid, $hash)
 	{
-		$this->nid = $nid;
-		$this->uuid = $uuid;
+		$this->encoded_id = $encoded_id;
+		$this->encoded_uuid = $encoded_uuid;
 		$this->hash = $hash;
 	}
 
@@ -162,6 +209,6 @@ class IndexKey
 	 */
 	public function __toString()
 	{
-		return self::format_key($this->nid, $this->uuid, $this->hash);
+		return self::format_key($this->encoded_id, $this->encoded_uuid, $this->hash);
 	}
 }

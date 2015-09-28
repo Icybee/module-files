@@ -27,10 +27,11 @@ class Pathname
 {
 	use AccessorTrait;
 
-	const HASH_LENGTH = 27;
+	const HASH_ALGO = 'sha384';
+	const HASH_LENGTH = 64;
 	const RANDOM_LENGTH = 16;
 	const BASE64URL_CHARACTER_CLASS = 'A-Za-z0-9\-_';
-	const FILENAME_REGEX = '([A-Za-z0-9\-_]{27})-([A-Za-z0-9\-_]{16})';
+	const FILENAME_REGEX = '([A-Za-z0-9\-_]{64})-([A-Za-z0-9\-_]{16})';
 
 	/**
 	 * Hash a file into a {@link HASH_LENGTH} character length string.
@@ -43,14 +44,14 @@ class Pathname
 	 */
 	static public function hash($pathname)
 	{
-		$hash = sha1_file($pathname);
+		$hash = hash_file(self::HASH_ALGO, $pathname, true);
 
 		if (!$hash)
 		{
 			throw new \LogicException("Unable to hash file: $pathname.");
 		}
 
-		return rtrim(self::base64url(hex2bin($hash)), '=');
+		return Base64::encode($hash);
 	}
 
 	/**
@@ -60,19 +61,7 @@ class Pathname
 	 */
 	static public function random()
 	{
-		return self::base64url(openssl_random_pseudo_bytes(12));
-	}
-
-	/**
-	 * Encodes data into base64url.
-	 *
-	 * @param string $data
-	 *
-	 * @return string
-	 */
-	static public function base64url($data)
-	{
-		return strtr(base64_encode($data), [ '+' => '-', '/' => '_' ]);
+		return Base64::encode(openssl_random_pseudo_bytes(12));
 	}
 
 	/**

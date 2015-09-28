@@ -23,44 +23,44 @@ class FileStorageIndex
 	use AccessorTrait;
 
 	const MATCH_BY_KEY = 1;
-	const MATCH_BY_NID = 2;
+	const MATCH_BY_ID = 2;
 	const MATCH_BY_UUID = 3;
 	const MATCH_BY_HASH = 4;
 
 	/**
 	 * Resolves matching type.
 	 *
-	 * @param IndexKey|int|string $key_or_nid_or_uuid_or_hash A {@link IndexKey}, a node
+	 * @param IndexKey|int|string $key_or_id_or_uuid_or_hash A {@link IndexKey}, a node
 	 * identifier, a v4 UUID, or a hash.
 	 *
 	 * @return int
 	 *
-	 * @throws \InvalidArgumentException if `$key_or_nid_or_uuid_or_hash` is not one of
+	 * @throws \InvalidArgumentException if `$key_or_id_or_uuid_or_hash` is not one of
 	 * the required type.
 	 */
-	static private function resolve_matching_type($key_or_nid_or_uuid_or_hash)
+	static private function resolve_matching_type($key_or_id_or_uuid_or_hash)
 	{
-		if ($key_or_nid_or_uuid_or_hash instanceof IndexKey)
+		if ($key_or_id_or_uuid_or_hash instanceof IndexKey)
 		{
 			return self::MATCH_BY_KEY;
 		}
 
-		if (is_numeric($key_or_nid_or_uuid_or_hash))
+		if (is_numeric($key_or_id_or_uuid_or_hash))
 		{
-			return self::MATCH_BY_NID;
+			return self::MATCH_BY_ID;
 		}
 
-		if (strlen($key_or_nid_or_uuid_or_hash) === IndexKey::UUID_LENGTH)
+		if (strlen($key_or_id_or_uuid_or_hash) === IndexKey::UUID_LENGTH)
 		{
 			return self::MATCH_BY_UUID;
 		}
 
-		if (strlen($key_or_nid_or_uuid_or_hash) === IndexKey::HASH_LENGTH)
+		if (strlen($key_or_id_or_uuid_or_hash) === IndexKey::HASH_LENGTH)
 		{
 			return self::MATCH_BY_HASH;
 		}
 
-		throw new \InvalidArgumentException("Expected IndexKey instance, node identifier, v4 UUID, or a hash. Got: $key_or_nid_or_uuid_or_hash");
+		throw new \InvalidArgumentException("Expected IndexKey instance, node identifier, v4 UUID, or a hash. Got: $key_or_id_or_uuid_or_hash");
 	}
 
 	/**
@@ -94,7 +94,7 @@ class FileStorageIndex
 	{
 		touch($this->root . $key);
 
-		foreach ($this->find_by_nid($key->nid) as $match)
+		foreach ($this->find_by_id($key->id) as $match)
 		{
 			if ($match === $key)
 			{
@@ -118,13 +118,13 @@ class FileStorageIndex
 	/**
 	 * Deletes key(s) from the index.
 	 *
-	 * @param IndexKey|int|string $key_or_nid_or_uuid_or_hash
+	 * @param IndexKey|int|string $key_or_id_or_uuid_or_hash
 	 *
-	 * @throws \InvalidArgumentException if `$key_or_nid_or_uuid_or_hash` is not of the expected type.
+	 * @throws \InvalidArgumentException if `$key_or_id_or_uuid_or_hash` is not of the expected type.
 	 */
-	public function delete($key_or_nid_or_uuid_or_hash)
+	public function delete($key_or_id_or_uuid_or_hash)
 	{
-		$matching = $this->find($key_or_nid_or_uuid_or_hash);
+		$matching = $this->find($key_or_id_or_uuid_or_hash);
 
 		if (!$matching)
 		{
@@ -140,26 +140,26 @@ class FileStorageIndex
 	/**
 	 * Finds composite keys.
 	 *
-	 * @param IndexKey|int|string $key_or_nid_or_uuid_or_hash
+	 * @param IndexKey|int|string $key_or_id_or_uuid_or_hash
 	 *
 	 * @return IndexKey[]
 	 *
-	 * @throws \InvalidArgumentException if `$key_or_nid_or_uuid_or_hash` is not of the expected type.
+	 * @throws \InvalidArgumentException if `$key_or_id_or_uuid_or_hash` is not of the expected type.
 	 */
-	public function find($key_or_nid_or_uuid_or_hash)
+	public function find($key_or_id_or_uuid_or_hash)
 	{
 		static $methods = [
 
 			self::MATCH_BY_KEY => 'key',
-			self::MATCH_BY_NID => 'nid',
+			self::MATCH_BY_ID => 'id',
 			self::MATCH_BY_UUID => 'uuid',
 			self::MATCH_BY_HASH => 'hash'
 
 		];
 
-		$type = $methods[self::resolve_matching_type($key_or_nid_or_uuid_or_hash)];
+		$type = $methods[self::resolve_matching_type($key_or_id_or_uuid_or_hash)];
 
-		return $this->{ 'find_by_' . $type }($key_or_nid_or_uuid_or_hash);
+		return $this->{ 'find_by_' . $type }($key_or_id_or_uuid_or_hash);
 	}
 
 	/**
@@ -177,15 +177,27 @@ class FileStorageIndex
 	}
 
 	/**
-	 * Returns the composite keys match a nid.
+	 * Returns the composite keys match an identifier.
 	 *
-	 * @param int $nid The node identifier to match.
+	 * @param int $id The node identifier to match.
 	 *
 	 * @return IndexKey[]
 	 */
-	protected function find_by_nid($nid)
+	protected function find_by_id($id)
 	{
-		return $this->matching('#^' . preg_quote(IndexKey::format_nid($nid)) . '\-#');
+		return $this->matching('#^' . preg_quote(IndexKey::encode_id($id)) . '\-#');
+	}
+
+	/**
+	 * Returns the composite keys match a v4 UUID.
+	 *
+	 * @param string $encoded_uuid The UUID to match.
+	 *
+	 * @return IndexKey[]
+	 */
+	protected function find_by_encoded_uuid($encoded_uuid)
+	{
+		return $this->matching("#^.{" . IndexKey::ENCODED_ID_LENGTH . '}\-' . preg_quote($encoded_uuid) . '\-#');
 	}
 
 	/**
@@ -197,7 +209,7 @@ class FileStorageIndex
 	 */
 	protected function find_by_uuid($uuid)
 	{
-		return $this->matching("#^.{" . IndexKey::HEXNID_LENGTH . '}\-' . preg_quote($uuid) . '\-#');
+		return $this->find_by_encoded_uuid(IndexKey::encode_uuid($uuid));
 	}
 
 	/**
@@ -209,7 +221,7 @@ class FileStorageIndex
 	 */
 	protected function find_by_hash($hash)
 	{
-		return $this->matching("#^.{" . IndexKey::HEXNID_LENGTH . '}\-.{' . IndexKey::UUID_LENGTH . '}\-' . preg_quote($hash) . '#');
+		return $this->matching("#^.{" . IndexKey::ENCODED_ID_LENGTH . '}\-.{' . IndexKey::ENCODED_UUID_LENGTH . '}\-' . preg_quote($hash) . '#');
 	}
 
 	/**

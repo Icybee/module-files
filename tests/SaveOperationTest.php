@@ -180,7 +180,8 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 
 		# cleanup
 
+		$pathname = $record->pathname;
 		$record->delete();
-		$this->assertFileNotExists((string) $record->pathname);
+		$this->assertFileNotExists((string) $pathname);
 	}
 }
