@@ -27,17 +27,7 @@ class FilesAdminController extends NodesAdminController
 {
 	use CoreBindings;
 
-	protected function is_action_method($action)
-	{
-		if ($action === 'download')
-		{
-			return true;
-		}
-
-		return parent::is_action_method($action);
-	}
-
-	protected function show($id)
+	protected function action_show($id)
 	{
 		/* @var $record File */
 
@@ -59,7 +49,7 @@ class FilesAdminController extends NodesAdminController
 		]);
 	}
 
-	protected function download($id)
+	protected function action_download($id)
 	{
 		/* @var $record File */
 
@@ -84,7 +74,7 @@ class FilesAdminController extends NodesAdminController
 
 		/* @var $record File */
 
-		$record = $this->model[$key->nid];
+		$record = $this->model[$key->id];
 
 		return new FileResponse($pathname, $this->request, [
 

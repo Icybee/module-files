@@ -187,6 +187,13 @@ class File extends Node
 			return $routes[$route_id]->format($this);
 		}
 
+		$route_id = "{$this->constructor}:$type";
+
+		if (isset($routes[$route_id]))
+		{
+			return $routes[$route_id]->format($this);
+		}
+
 		$route_id = "files:$type";
 
 		if (isset($routes[$route_id]))
