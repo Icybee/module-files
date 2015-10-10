@@ -75,7 +75,7 @@ class FilesController extends Controller
 
 		/* @var $record File */
 
-		$record = $this->model[$key->nid];
+		$record = $this->model[$key->id];
 
 		return new FileResponse($pathname, $this->request, [
 

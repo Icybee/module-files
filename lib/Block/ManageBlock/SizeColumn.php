@@ -1,8 +1,15 @@
 <?php
 
-namespace Icybee\Modules\Files\Block\ManageBlock;
+/*
+ * This file is part of the Icybee package.
+ *
+ * (c) Olivier Laviale <olivier.laviale@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
-use ICanBoogie\ActiveRecord\Query;
+namespace Icybee\Modules\Files\Block\ManageBlock;
 
 use Icybee\Block\ManageBlock;
 
@@ -11,6 +18,8 @@ use Icybee\Block\ManageBlock;
  */
 class SizeColumn extends ManageBlock\SizeColumn
 {
+	use ManageBlock\CriterionColumnTrait;
+
 	public function __construct(ManageBlock $manager, $id, array $options = [])
 	{
 		parent::__construct($manager, $id, $options + [
@@ -27,66 +36,5 @@ class SizeColumn extends ManageBlock\SizeColumn
 				]
 			]
 		]);
-	}
-
-	/**
-	 * Adds support for the `size` filter.
-	 *
-	 * @inheritdoc
-	 */
-	public function alter_filters(array $filters, array $modifiers)
-	{
-		$filters = parent::alter_filters($filters, $modifiers);
-
-		if (isset($modifiers['size']))
-		{
-			$value = $modifiers['size'];
-
-			if (in_array($value, [ 'l', 'm', 's' ]))
-			{
-				$filters['size'] = $value;
-			}
-			else
-			{
-				unset($filters['size']);
-			}
-		}
-
-		return $filters;
-	}
-
-	/**
-	 * Adds support for the `size` filter.
-	 *
-	 * @inheritdoc
-	 */
-	public function alter_query_with_filter(Query $query, $filter_value)
-	{
-		if ($filter_value)
-		{
-			list($avg, $max, $min) = $query->model
-				->similar_site
-				->select('AVG(size), MAX(size), MIN(size)')
-				->one(\PDO::FETCH_NUM);
-
-			$bounds = [
-
-				$min,
-				round($avg - ($avg - $min) / 3),
-				round($avg),
-				round($avg + ($max - $avg) / 3),
-				$max
-
-			];
-
-			switch ($filter_value)
-			{
-				case 'l': $query->and('size >= ?', $bounds[3]); break;
-				case 'm': $query->and('size >= ? AND size < ?', $bounds[2], $bounds[3]); break;
-				case 's': $query->and('size < ?', $bounds[2]); break;
-			}
-		}
-
-		return $query;
 	}
 }
