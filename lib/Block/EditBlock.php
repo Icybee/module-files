@@ -72,7 +72,18 @@ class EditBlock extends \Icybee\Modules\Nodes\Block\EditBlock
 
 		if (!$path && $this->record)
 		{
-			$path = $this->record->pathname->relative;
+			try
+			{
+				$path = $this->record->pathname->relative;
+			}
+			catch (\Exception $e)
+			{
+				#
+				# the associated file might have disappeared
+				#
+
+				\ICanBoogie\log_error($e->getMessage());
+			}
 		}
 
 		$this->attributes = \ICanBoogie\array_merge_recursive($this->attributes, [
