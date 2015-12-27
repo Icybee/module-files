@@ -12,9 +12,9 @@
 namespace Icybee\Modules\Files\Facets;
 
 use ICanBoogie\ActiveRecord\Query;
-use ICanBoogie\Facets\Criterion;
+use ICanBoogie\Facets\Criterion\BasicCriterion;
 
-class SizeCriterion extends Criterion
+class SizeCriterion extends BasicCriterion
 {
 	/**
 	 * Adds support for the `size` filter.
