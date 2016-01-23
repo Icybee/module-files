@@ -98,8 +98,10 @@ class File extends Node
 	 * The {@link $title} property is updated as well if it is empty.
 	 *
 	 * After the record is saved, the {@link HTTP_FILE} property is removed.
+	 *
+	 * @inheritdoc
 	 */
-	public function save()
+	public function save(array $options = [])
 	{
 		/* @var $file HTTPFile */
 
@@ -111,7 +113,7 @@ class File extends Node
 			$this->save_file_before($file);
 		}
 
-		$rc = parent::save();
+		$rc = parent::save($options);
 
 		if ($rc && $file)
 		{

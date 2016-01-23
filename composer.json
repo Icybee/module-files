@@ -21,17 +21,17 @@
 	"minimum-stability": "dev",
 
 	"require": {
-		"php": ">=5.5.0",
-		"icanboogie/module-installer": "^1.2.3",
-		"icanboogie/http": "^2.5.0",
-		"icybee/module-registry": "^3.0.0",
-		"icybee/module-nodes": "^3.0.0"
+		"php": "^5.5|^7.0",
+		"icanboogie/module-installer": "^1.2",
+		"icanboogie/http": "^2.5",
+		"icybee/module-registry": "^3.0",
+		"icybee/module-nodes": "^3.0"
 	},
 
 	"require-dev": {
-		"icanboogie/icanboogie": "^3.0.0",
-		"icanboogie/bind-cldr": "^1.0.0",
-		"icanboogie/i18n": "^2.0.8"
+		"icanboogie/icanboogie": "^3.0",
+		"icanboogie/bind-cldr": "^1.0",
+		"icanboogie/i18n": "^2.0"
 	},
 
 	"autoload": {
