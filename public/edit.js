@@ -16,7 +16,7 @@ window.addEvent('load', function() {
 
 	form.getElements('.widget-file').each(function(el) {
 
-		var widget = el.get('widget')
+		var widget = Brickrouge.from(el)
 
 		widget.addEvent('change', function(response) {
 
