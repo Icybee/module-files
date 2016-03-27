@@ -11,7 +11,7 @@
 
 namespace Icybee\Modules\Files\Operation;
 
-use ICanboogie\Errors;
+use ICanboogie\ErrorCollection;
 use ICanBoogie\HTTP\File as HTTPFile;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
@@ -70,7 +70,7 @@ class UploadOperation extends Operation
 	 *
 	 * @inheritdoc
 	 */
-	protected function validate(Errors $errors)
+	protected function validate(ErrorCollection $errors)
 	{
 		#
 		# forces 'application/json' response type
@@ -93,17 +93,17 @@ class UploadOperation extends Operation
 
 		if ($max_file_size && $max_file_size < $file->size)
 		{
-			$error_message = $errors->format("Maximum file size is :size Mb", [ ':size' => round($max_file_size / 1024) ]);
+			$error_message = $errors->add("Maximum file size is :size Mb", [ ':size' => round($max_file_size / 1024) ]);
 		}
 
 		if (!$file->match($this->accept))
 		{
-			$error_message = $errors->format("Only the following file types are accepted: %accepted.", [ '%accepted' => implode(', ', $this->accept) ]);
+			$error_message = $errors->add("Only the following file types are accepted: %accepted.", [ '%accepted' => implode(', ', $this->accept) ]);
 		}
 
 		if ($error_message)
 		{
-			$errors[File::HTTP_FILE] = $error_message;
+			$errors->add(File::HTTP_FILE, $error_message);
 		}
 
 		return true;

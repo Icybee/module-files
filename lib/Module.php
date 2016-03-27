@@ -11,7 +11,7 @@
 
 namespace Icybee\Modules\Files;
 
-use ICanBoogie\Errors;
+use ICanBoogie\ErrorCollection;
 
 class Module extends \Icybee\Modules\Nodes\Module
 {
@@ -26,7 +26,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 	 *
 	 * @inheritdoc
 	 */
-	public function install(Errors $errors)
+	public function install(ErrorCollection $errors)
 	{
 		$repository = \ICanBoogie\REPOSITORY;
 
@@ -110,7 +110,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 	 *
 	 * @inheritdoc
 	 */
-	public function is_installed(Errors $errors)
+	public function is_installed(ErrorCollection $errors)
 	{
 		$repository = \ICanBoogie\REPOSITORY;
 

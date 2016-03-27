@@ -11,7 +11,7 @@
 
 namespace Icybee\Modules\Files\Operation;
 
-use ICanBoogie\Errors;
+use ICanBoogie\ErrorCollection;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\HTTP\File as HTTPFile;
 
@@ -146,7 +146,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 	 *
 	 * @inheritdoc
 	 */
-	protected function validate(Errors $errors)
+	protected function validate(ErrorCollection $errors)
 	{
 		$file = $this->file;
 
@@ -158,12 +158,12 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 
 			if ($max_file_size && $max_file_size < $file->size)
 			{
-				$error_message = $errors->format("Maximum file size is :size Mb", [ ':size' => round($max_file_size / 1024) ]);
+				$error_message = $errors->add("Maximum file size is :size Mb", [ ':size' => round($max_file_size / 1024) ]);
 			}
 
 			if ($this->accept && !$file->match($this->accept))
 			{
-				$error_message = $errors->format("Only the following file types are accepted: %accepted.", [ '%accepted' => implode(', ', $this->accept) ]);
+				$error_message = $errors->add("Only the following file types are accepted: %accepted.", [ '%accepted' => implode(', ', $this->accept) ]);
 			}
 
 			if ($error_message)
