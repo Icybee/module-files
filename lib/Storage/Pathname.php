@@ -29,6 +29,7 @@ class Pathname
 
 	const HASH_ALGO = 'sha384';
 	const HASH_LENGTH = 64;
+	const SHORT_HASH_LENGTH = 8;
 	const RANDOM_LENGTH = 16;
 	const BASE64URL_CHARACTER_CLASS = 'A-Za-z0-9\-_';
 	const FILENAME_REGEX = '([A-Za-z0-9\-_]{64})-([A-Za-z0-9\-_]{16})';
@@ -52,6 +53,18 @@ class Pathname
 		}
 
 		return Base64::encode($hash);
+	}
+
+	/**
+	 * Hash a file into a {@link SHORT_HASH_LENGTH} character length string.
+	 *
+	 * @param string $pathname Absolute pathname to the file.
+	 *
+	 * @return string A short hash of the file.
+	 */
+	static public function short_hash($pathname)
+	{
+		return substr(self::hash($pathname), 0, self::SHORT_HASH_LENGTH);
 	}
 
 	/**
@@ -90,9 +103,12 @@ class Pathname
 		return $this->hash;
 	}
 
+	/**
+	 * @return string
+	 */
 	protected function get_short_hash()
 	{
-		return substr($this->hash, 0, 8);
+		return substr($this->hash, 0, self::SHORT_HASH_LENGTH);
 	}
 
 	/**
