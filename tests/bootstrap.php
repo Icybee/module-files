@@ -15,6 +15,7 @@ use ICanBoogie\Core;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
 
+use ICanBoogie\Prototype;
 use Icybee\Modules\Files\Operation\SaveOperation;
 use Icybee\Modules\Users\User;
 
@@ -109,6 +110,18 @@ $app = new Core(\ICanBoogie\array_merge_recursive(\ICanBoogie\get_autoconfig(), 
 
 $app->boot();
 $app->modules->install();
-$app->site_id = 0; // so we don't have to deal with the website
 
-User::from([ 'username' => 'admin', 'email' => 'admin@example.com' ])->save();
+// so we don't have to deal with the website
+Prototype::from(Core::class)['get_site_id'] = function() {
+
+	return 0;
+
+};
+
+User::from([
+
+	User::USERNAME => 'admin',
+	User::EMAIL => 'admin@example.com',
+	User::TIMEZONE => 'Europe/Paris'
+
+])->save();

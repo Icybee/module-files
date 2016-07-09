@@ -85,8 +85,9 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 			$errors = $failure->operation->response->errors;
 
 			$this->assertNotNull($errors[File::HTTP_FILE]);
-			$this->assertStringStartsWith("Unable to upload file", (string) $errors[File::HTTP_FILE]);
-			$this->assertNotEmpty(strpos($errors[File::HTTP_FILE], $message));
+			$error = (string) $errors[File::HTTP_FILE][0];
+			$this->assertStringStartsWith("Unable to upload file", $error);
+			$this->assertNotEmpty(strpos($error, $message));
 		}
 	}
 

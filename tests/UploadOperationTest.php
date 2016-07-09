@@ -79,7 +79,7 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 			$errors = $failure->operation->response->errors;
 
 			$this->assertNotNull($errors[SaveOperation::USERFILE]);
-			$this->assertStringStartsWith($message, (string) $errors[SaveOperation::USERFILE]);
+			$this->assertStringStartsWith($message, (string) $errors[SaveOperation::USERFILE][0]);
 		}
 		catch (\Exception $e)
 		{

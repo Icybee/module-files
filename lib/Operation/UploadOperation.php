@@ -93,7 +93,8 @@ class UploadOperation extends Operation
 
 		if ($max_file_size && $max_file_size < $file->size)
 		{
-			$error_message = $errors->add(
+			$error_message = null;
+			$errors->add(
 				File::HTTP_FILE,
 				"Maximum file size is :size Mb",
 				[ ':size' => round($max_file_size / 1024) ]
@@ -102,7 +103,8 @@ class UploadOperation extends Operation
 
 		if (!$file->match($this->accept))
 		{
-			$error_message = $errors->add(
+			$error_message = null;
+			$errors->add(
 				File::HTTP_FILE,
 				"Only the following file types are accepted: %accepted.",
 				[ '%accepted' => implode(', ', $this->accept) ]
@@ -111,7 +113,7 @@ class UploadOperation extends Operation
 
 		if ($error_message)
 		{
-			$errors->add(File::HTTP_FILE, $error_message);
+			$errors->add(File::HTTP_FILE, (string) $error_message);
 		}
 
 		return true;
