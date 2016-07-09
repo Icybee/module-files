@@ -100,3 +100,28 @@ class Update20150902 extends Update
 		$model->remove_column('path');
 	}
 }
+
+/**
+ * - Add column `short_hash`.
+ *
+ * @module files
+ *
+ * @property \ICanBoogie\Core|Binding\CoreBindings $app
+ */
+class Update20160709 extends Update
+{
+	public function update_column_short_hash()
+	{
+		$model = $this->module->model;
+		$model
+			->assert_not_has_column('short_hash')
+			->create_column('short_hash');
+
+		$update = $model->prepare("UPDATE {self} SET short_hash = ? WHERE nid = ?");
+
+		foreach ($model->all as $record)
+		{
+			$update($record->pathname->short_hash, $record->nid);
+		}
+	}
+}

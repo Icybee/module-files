@@ -30,6 +30,7 @@ return [
 				'size' => [ 'integer', 'unsigned' => true ],
 				'mime' => [ 'varchar', 'charset' => 'ascii/general_ci' ],
 				'extension' => [ 'varchar', 16, 'charset' => 'ascii/general_ci' ],
+				'short_hash' => [ 'char', 8 ],
 				'description' => 'text'
 
 			]

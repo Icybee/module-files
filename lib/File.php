@@ -23,6 +23,7 @@ use Icybee\Modules\Nodes\Node;
  * @property-read \ICanBoogie\Core|\Icybee\Binding\Core\CoreBindings|Binding\CoreBindings $app
  * @property-read Storage\FileStorage $file_storage
  * @property-read Pathname $pathname Absolute path to the file.
+ * @property-read string $short_hash
  */
 class File extends Node
 {
@@ -82,6 +83,21 @@ class File extends Node
 		}
 
 		return $pathname;
+	}
+
+	/**
+	 * @var string
+	 */
+	protected $short_hash;
+
+	/**
+	 * Returns the short hash of the file.
+	 *
+	 * @return string
+	 */
+	protected function get_short_hash()
+	{
+		return $this->short_hash ?: $this->pathname->short_hash;
 	}
 
 	/**
@@ -147,6 +163,7 @@ class File extends Node
 		$this->mime = $file->type;
 		$this->size = $file->size;
 		$this->extension = $file->extension;
+		$this->short_hash = Pathname::short_hash($file->pathname);
 
 		if (!$this->title)
 		{
