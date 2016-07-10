@@ -1,39 +1,55 @@
-window.addEvent('load', function() {
+!function (Brickrouge) {
 
-	var form = document.body.getElement('.form-primary.edit')
-	, controls = []
-	, controlValue = []
+	"use strict"
 
-	form.getElements('input[type=text]').each(function (control) {
+	/**
+	 * @param {Brickrouge.WidgetEvent} ev
+	 */
+	Brickrouge.observeRunning(ev => {
 
-		controls.push(control)
+		const form = document.body.querySelector('.form-primary.edit')
+		const controls = []
+		const controlValue = []
 
-		if (control.value)
-		{
-			controlValue[control.uniqueNumber] = true
-		}
-	})
+		form.querySelectorAll('input[type=text]').forEach(control => {
 
-	form.getElements('.widget-file').each(function(el) {
+			controls.push(control)
 
-		var widget = Brickrouge.from(el)
+			if (control.value)
+			{
+				controlValue[Brickrouge.uidOf(control)] = true
+			}
+		})
 
-		widget.addEvent('change', function(response) {
+		form.querySelectorAll('.widget-file').forEach(element => {
 
-			Object.each(response.rc, function(value, key) {
+			/**
+			 * @param {Brickrouge.File.ChangeEvent} ev
+			 */
+			Brickrouge.from(element).observeChange(ev => {
 
-				var control = document.id(form.elements[key])
+				Object.forEach(ev.response.rc, (value, key) => {
 
-				if (!control) return
+					const control = form.elements[key]
 
-				if (control.value && (controls.indexOf(control) == -1 || (controlValue[control.uniqueNumber] && controlValue[control.uniqueNumber] != control.value)))
-				{
-					return
-				}
+					if (!control)
+					{
+						return
+					}
 
-				controlValue[control.uniqueNumber] = value
-				control.value = value
+					const uid = Brickrouge.uidOf(control)
+
+					if (control.value && (controls.indexOf(control) == -1 || (controlValue[uid] && controlValue[uid] != control.value)))
+					{
+						return
+					}
+
+					controlValue[uid] = value
+					control.value = value
+				})
 			})
 		})
+
 	})
-})
+
+} (Brickrouge)
