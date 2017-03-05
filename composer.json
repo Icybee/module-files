@@ -2,24 +2,26 @@
 	"name": "icybee/module-files",
 	"type": "icanboogie-module",
 	"description": "Manages the files uploaded by the users of the CMS Icybee.",
-	"keywords": [ "file", "upload" ],
+	"keywords": [
+		"file",
+		"upload"
+	],
 	"license": "BSD-3-Clause",
 	"authors": [
 		{
 			"name": "Olivier Laviale",
 			"email": "olivier.laviale@gmail.com",
-			"homepage": "http://www.weirdog.com/",
-			"role" : "Developer"
+			"homepage": "http://olvlvl.com/",
+			"role": "Developer"
 		}
 	],
-
 	"support": {
 		"issues": "https://github.com/Icybee/module-files/issues",
 		"source": "https://github.com/Icybee/module-files"
 	},
-
 	"minimum-stability": "dev",
-
+	"prefer-stable": true,
+	"prefer-dist": true,
 	"require": {
 		"php": "^5.5|^7.0",
 		"icanboogie/module-installer": "^1.2",
@@ -27,19 +29,16 @@
 		"icybee/module-registry": "^3.0",
 		"icybee/module-nodes": "^3.0"
 	},
-
 	"require-dev": {
 		"icanboogie/icanboogie": "^3.0",
 		"icanboogie/bind-cldr": "^1.0",
 		"icanboogie/i18n": "^2.0"
 	},
-
 	"autoload": {
 		"psr-4": {
 			"Icybee\\Modules\\Files\\": "lib"
 		}
 	},
-
 	"scripts": {
 		"post-autoload-dump": "ICanBoogie\\Autoconfig\\Hooks::on_autoload_dump"
 	}
