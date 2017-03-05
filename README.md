@@ -1,4 +1,11 @@
-# Files [![Build Status](https://travis-ci.org/Icybee/module-files.png?branch=2.1)](https://travis-ci.org/Icybee/module-files)
+# Files
+
+[![Release](https://img.shields.io/packagist/v/icybee/module-files.svg)](https://github.com/Icybee/module-files/releases)
+[![Build Status](https://img.shields.io/travis/Icybee/module-files/master.svg)](http://travis-ci.org/Icybee/module-files)
+[![HHVM](https://img.shields.io/hhvm/icybee/module-files.svg)](http://hhvm.h4cc.de/package/icybee/module-files)
+[![Code Quality](https://img.shields.io/scrutinizer/g/Icybee/module-files/master.svg)](https://scrutinizer-ci.com/g/Icybee/module-files)
+[![Code Coverage](https://img.shields.io/coveralls/Icybee/module-files/master.svg)](https://coveralls.io/r/Icybee/module-files)
+[![Packagist](https://img.shields.io/packagist/dt/icybee/module-files.svg)](https://packagist.org/packages/icybee/module-files)
 
 The module "Files" (`files`) manages the files uploaded by the users of the
 CMS [Icybee](http://icybee.org/).
@@ -26,7 +33,7 @@ The package requires PHP 5.4 or later.
 The recommended way to install this package is through [Composer](http://getcomposer.org/):
 
 ```
-$ composer require icybee/module-files:~2.1
+$ composer require icybee/module-files
 ```
 
 Note: The module is part of the modules required by Icybee.
@@ -66,8 +73,8 @@ directory can later be cleaned with the `make clean` command.
 
 The package is continuously tested by [Travis CI](http://about.travis-ci.org/).
 
-[![Build Status](https://travis-ci.org/Icybee/module-files.png?branch=2.1)](https://travis-ci.org/Icybee/module-files)
-
+[![Build Status](https://img.shields.io/travis/Icybee/module-files/master.svg)](http://travis-ci.org/Icybee/module-files)
+[![Code Coverage](https://img.shields.io/coveralls/Icybee/module-files/master.svg)](https://coveralls.io/r/Icybee/module-files)
 
 
 
