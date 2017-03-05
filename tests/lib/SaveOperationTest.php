@@ -11,6 +11,7 @@
 
 namespace Icybee\Modules\Files;
 
+use function ICanBoogie\get_sandbox_directory;
 use ICanBoogie\HTTP\File as HTTPFile;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
@@ -130,7 +131,7 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 	public function test_successful()
 	{
 		$extension = '.php';
-		$pathname = __DIR__ . '/sandbox/' . \ICanBoogie\generate_v4_uuid() . $extension;
+		$pathname = get_sandbox_directory() . '/' . \ICanBoogie\generate_v4_uuid() . $extension;
 		copy(__FILE__, $pathname);
 		$size = filesize($pathname);
 

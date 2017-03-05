@@ -11,12 +11,13 @@
 
 namespace Icybee\Modules\Files\Operation;
 
+use ICanBoogie\AppConfig;
+use ICanBoogie\Binding\PrototypedBindings;
 use ICanboogie\ErrorCollection;
 use ICanBoogie\HTTP\File as HTTPFile;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\Operation;
 
-use Icybee\Binding\Core\PrototypedBindings;
 use Icybee\Modules\Files\File;
 use Icybee\Modules\Files\Module;
 
@@ -25,7 +26,6 @@ use Icybee\Modules\Files\Module;
  *
  * @property-read HTTPFile $file The uploaded file.
  * @property Module $module
- * @property \ICanBoogie\Core|\Icybee\Binding\Core\CoreBindings|\Icybee\Modules\Registry\Binding\CoreBindings $app
  */
 class UploadOperation extends Operation
 {
@@ -161,7 +161,7 @@ EOT;
 	 */
 	protected function create_temporary_file(HTTPFile $file)
 	{
-		$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . \ICanBoogie\generate_v4_uuid() . $file->extension;
+		$pathname = $this->app->config[AppConfig::REPOSITORY_TMP] . DIRECTORY_SEPARATOR . \ICanBoogie\generate_v4_uuid() . $file->extension;
 
 		$file->move($pathname);
 

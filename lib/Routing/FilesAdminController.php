@@ -14,7 +14,7 @@ namespace Icybee\Modules\Files\Routing;
 use ICanBoogie\HTTP\FileResponse;
 use ICanBoogie\HTTP\Request;
 
-use Icybee\Modules\Files\Binding\CoreBindings;
+use Icybee\Modules\Files\Binding\ApplicationBindings;
 use Icybee\Modules\Files\File;
 use Icybee\Modules\Files\FileModel;
 use Icybee\Modules\Files\Module;
@@ -25,7 +25,7 @@ use Icybee\Modules\Nodes\Routing\NodesAdminController;
  */
 class FilesAdminController extends NodesAdminController
 {
-	use CoreBindings;
+	use ApplicationBindings;
 
 	protected function action_show($id)
 	{

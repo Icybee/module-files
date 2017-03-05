@@ -13,20 +13,13 @@
 >
 	<testsuites>
 		<testsuite name="icybee/module-files">
-			<directory>./tests</directory>
+			<directory>./tests/lib</directory>
 		</testsuite>
 	</testsuites>
 
 	<filter>
-		<whitelist processUncoveredFilesFromWhitelist="true">
+		<whitelist processUncoveredFilesFromWhitelist="false">
 			<directory suffix=".php">./lib</directory>
-			<exclude>
-				<directory suffix=".php">./lib/Block</directory>
-				<directory suffix=".php">./lib/Routing</directory>
-				<directory suffix=".php">./vendor</directory>
-				<file>./lib/FileUpload.php</file>
-				<file>./lib/Operation/ConfigOperation.php</file>
-			</exclude>
 		</whitelist>
 	</filter>
 </phpunit>

@@ -11,6 +11,7 @@
 
 namespace Icybee\Modules\Files;
 
+use function ICanBoogie\get_sandbox_directory;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\HTTP\File as HTTPFile;
 use ICanBoogie\Operation;
@@ -107,7 +108,7 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 	public function test_successful()
 	{
 		$source = __FILE__;
-		$pathname = __DIR__ . '/sandbox/' . basename(__FILE__);
+		$pathname = get_sandbox_directory() . '/' . basename(__FILE__);
 
 		copy($source, $pathname);
 
@@ -151,7 +152,7 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 	public function test_save_uploaded()
 	{
 		$source = __FILE__;
-		$pathname = __DIR__ . '/sandbox/' . basename(__FILE__);
+		$pathname = get_sandbox_directory() . '/' . basename(__FILE__);
 
 		copy($source, $pathname);
 

@@ -11,7 +11,8 @@
 
 namespace Icybee\Modules\Files\Block;
 
-use ICanBoogie\I18n;
+use ICanBoogie\AppConfig;
+use ICanBoogie\Binding\PrototypedBindings;
 use ICanBoogie\Operation;
 
 use Brickrouge\Element;
@@ -26,6 +27,8 @@ use Icybee\Modules\Files\File;
  */
 class EditBlock extends \Icybee\Modules\Nodes\Block\EditBlock
 {
+	use PrototypedBindings;
+
 	const ACCEPT = '#files-accept';
 	const UPLOADER_CLASS = 'uploader class';
 
@@ -52,7 +55,7 @@ class EditBlock extends \Icybee\Modules\Nodes\Block\EditBlock
 
 	protected function lazy_get_children()
 	{
-		$folder = \ICanBoogie\REPOSITORY . 'tmp';
+		$folder = $this->app->config[AppConfig::REPOSITORY_TMP];
 
 		if (!is_writable($folder))
 		{

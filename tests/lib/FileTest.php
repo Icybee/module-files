@@ -11,6 +11,7 @@
 
 namespace Icybee\Modules\Files;
 
+use function ICanBoogie\create_file;
 use ICanBoogie\HTTP\File as HTTPFile;
 
 use Icybee\Modules\Files\Storage\FileStorage;

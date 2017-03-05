@@ -12,13 +12,12 @@
 namespace Icybee\Modules\Files\Routing;
 
 use ICanBoogie\HTTP\FileResponse;
-use ICanBoogie\HTTP\Request;
 use ICanBoogie\Routing\Controller;
 use ICanBoogie\Binding\Routing\ControllerBindings;
 use ICanBoogie\Binding\Routing\ForwardUndefinedPropertiesToApplication;
 use ICanBoogie\Module\ControllerBindings as ModuleBindings;
 
-use Icybee\Modules\Files\Binding\CoreBindings;
+use Icybee\Modules\Files\Binding\ApplicationBindings;
 use Icybee\Modules\Files\File;
 
 /**
@@ -27,7 +26,7 @@ use Icybee\Modules\Files\File;
 class FilesController extends Controller
 {
 	use Controller\ActionTrait;
-	use ControllerBindings, CoreBindings, ModuleBindings;
+	use ControllerBindings, ApplicationBindings, ModuleBindings;
 	use ForwardUndefinedPropertiesToApplication;
 
 	/**

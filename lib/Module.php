@@ -11,6 +11,7 @@
 
 namespace Icybee\Modules\Files;
 
+use ICanBoogie\AppConfig;
 use ICanBoogie\ErrorCollection;
 
 class Module extends \Icybee\Modules\Nodes\Module
@@ -28,13 +29,13 @@ class Module extends \Icybee\Modules\Nodes\Module
 	 */
 	public function install(ErrorCollection $errors)
 	{
-		$repository = \ICanBoogie\REPOSITORY;
+		$config = $this->app->config;
 
 		#
 		# $repository/tmp
 		#
 
-		$path = $repository . 'tmp';
+		$path = $config[AppConfig::REPOSITORY_TMP];
 
 		if (!file_exists($path))
 		{
@@ -56,7 +57,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 		# $repository/files
 		#
 
-		$path = $repository . 'files';
+		$path = $config[AppConfig::REPOSITORY_FILES];
 
 		if (!file_exists($path))
 		{
@@ -78,7 +79,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 		# $repository/files-index
 		#
 
-		$path = $repository . 'files-index';
+		$path = $config[AppConfig::REPOSITORY] . '/files-index';
 
 		if (!file_exists($path))
 		{
@@ -112,13 +113,13 @@ class Module extends \Icybee\Modules\Nodes\Module
 	 */
 	public function is_installed(ErrorCollection $errors)
 	{
-		$repository = \ICanBoogie\REPOSITORY;
+		$config = $this->app->config;
 
 		#
 		# $repository/tmp
 		#
 
-		$path = $repository . 'tmp';
+		$path = $config[AppConfig::REPOSITORY_TMP];
 
 		if (!is_dir($path))
 		{
@@ -129,7 +130,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 		# $repository/files
 		#
 
-		$path = $repository . 'files';
+		$path = $config[AppConfig::REPOSITORY_FILES];
 
 		if (!is_dir($path))
 		{
@@ -141,7 +142,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 
 	public function clean_temporary_files($lifetime = 3600)
 	{
-		$path = \ICanBoogie\REPOSITORY . 'tmp';
+		$path = $this->app->config[AppConfig::REPOSITORY_TMP];
 
 		if (!is_dir($path))
 		{
@@ -169,7 +170,7 @@ class Module extends \Icybee\Modules\Nodes\Module
 
 		chdir($path);
 
-		while ($file = readdir($dh))
+		while (($file = readdir($dh)))
 		{
 			if ($file{0} == '.')
 			{

@@ -11,7 +11,8 @@
 
 namespace Icybee\Modules\Files;
 
-use ICanBoogie\Core;
+use ICanBoogie\AppConfig;
+use ICanBoogie\Application;
 
 use Icybee\Modules\Files\Storage\FileStorage;
 use Icybee\Modules\Files\Storage\FileStorageIndex;
@@ -19,26 +20,30 @@ use Icybee\Modules\Files\Storage\FileStorageIndex;
 class Hooks
 {
 	/**
-	 * @param Core|Binding\CoreBindings $app
+	 * @param Application $app
 	 *
 	 * @return FileStorageIndex
 	 */
-	static public function get_file_storage_index(Core $app)
+	static public function get_file_storage_index(Application $app)
 	{
 		static $index;
 
-		return $index ?: $index = new FileStorageIndex(\ICanBoogie\REPOSITORY . 'files-index');
+		$directory = $app->config[AppConfig::REPOSITORY] . '/files-index';
+
+		return $index ?: $index = new FileStorageIndex($directory);
 	}
 
 	/**
-	 * @param Core|Binding\CoreBindings $app
+	 * @param Application $app
 	 *
 	 * @return FileStorage
 	 */
-	static public function get_file_storage(Core $app)
+	static public function get_file_storage(Application $app)
 	{
 		static $manager;
 
-		return $manager ?: $manager = new FileStorage(\ICanBoogie\REPOSITORY . 'files', $app->file_storage_index);
+		$directory = $app->config[AppConfig::REPOSITORY_FILES];
+
+		return $manager ?: $manager = new FileStorage($directory, $app->file_storage_index);
 	}
 }

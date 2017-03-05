@@ -9,20 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Icybee\Modules\Files;
+namespace ICanBoogie;
 
-use ICanBoogie\Core;
 use ICanBoogie\HTTP\Request;
-use ICanBoogie\Operation;
-
-use ICanBoogie\Prototype;
 use Icybee\Modules\Files\Operation\SaveOperation;
 use Icybee\Modules\Users\User;
 
+chdir(__DIR__);
+
 $_SERVER['DOCUMENT_ROOT'] = __DIR__;
 
-$autoload = require __DIR__ . '/../vendor/autoload.php';
-$autoload->addPsr4('Icybee\Modules\Files\\', __DIR__);
+require __DIR__ . '/../vendor/autoload.php';
+
+function get_sandbox_directory()
+{
+	return __DIR__ . DIRECTORY_SEPARATOR . 'sandbox';
+}
 
 /**
  * Create a new file record.
@@ -80,35 +82,14 @@ function create_file_record($src, array $attributes=[])
 function create_file($extension = '')
 {
 	$filename = \ICanBoogie\generate_v4_uuid() . $extension;
-	$pathname = __DIR__ . DIRECTORY_SEPARATOR . 'sandbox' . DIRECTORY_SEPARATOR . $filename;
+	$pathname = get_sandbox_directory() . DIRECTORY_SEPARATOR . $filename;
 
 	file_put_contents($pathname, openssl_random_pseudo_bytes(10000));
 
 	return $pathname;
 }
 
-/* @var $app Core|\ICanBoogie\Module\CoreBindings|\Icybee\Modules\Sites\Binding\CoreBindings */
-
-$app = new Core(\ICanBoogie\array_merge_recursive(\ICanBoogie\get_autoconfig(), [
-
-	'config-path' => [
-
-		__DIR__ . DIRECTORY_SEPARATOR . 'config' => 10
-
-	],
-
-	'module-path' => [
-
-		realpath(__DIR__ . '/../')
-
-	],
-
-	'error_handler' => null,
-	'exception_handler' => null
-
-]));
-
-$app->boot();
+$app = boot();
 $app->modules->install();
 
 // so we don't have to deal with the website

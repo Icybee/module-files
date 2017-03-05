@@ -15,12 +15,12 @@ use Icybee\Modules\Files\Storage\FileStorage;
 use Icybee\Modules\Files\Storage\FileStorageIndex;
 
 /**
- * {@link \ICanBoogie\Core} prototype bindings.
+ * {@link \ICanBoogie\Application} prototype bindings.
  *
  * @property FileStorageIndex $file_storage_index
  * @property FileStorage $file_storage
  */
-trait CoreBindings
+trait ApplicationBindings
 {
 
 }

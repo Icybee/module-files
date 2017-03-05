@@ -2,25 +2,25 @@
 
 /*
  * This file is part of the Icybee package.
-*
-* (c) Olivier Laviale <olivier.laviale@gmail.com>
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+ *
+ * (c) Olivier Laviale <olivier.laviale@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Icybee\Modules\Files;
 
+use ICanBoogie\ActiveRecord;
+use ICanBoogie\Binding\PrototypedBindings;
 use ICanBoogie\HTTP\File as HTTPFile;
 
-use Icybee\Binding\Core\PrototypedBindings;
 use Icybee\Modules\Files\Storage\Pathname;
 use Icybee\Modules\Nodes\Node;
 
 /**
  * Representation of a managed file.
  *
- * @property-read \ICanBoogie\Core|\Icybee\Binding\Core\CoreBindings|Binding\CoreBindings $app
  * @property-read Storage\FileStorage $file_storage
  * @property-read Pathname $pathname Absolute path to the file.
  * @property-read string $short_hash
@@ -187,6 +187,20 @@ class File extends Node
 		}
 
 		$storage->index($this->nid, $this->uuid, $pathname->hash);
+	}
+
+	/**
+	 * Add `short_hash` to the persisting properties.
+	 *
+	 * @inheritdoc
+	 */
+	protected function alter_persistent_properties(array $properties, ActiveRecord\Schema $schema)
+	{
+		return [
+
+			'short_hash' => $this->short_hash
+
+		] + parent::alter_persistent_properties($properties, $schema);
 	}
 
 	/**

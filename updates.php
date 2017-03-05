@@ -47,7 +47,7 @@ class Update20120101 extends Update
  *
  * @module files
  *
- * @property \ICanBoogie\Core|Binding\CoreBindings $app
+ * @property \ICanBoogie\Core|Binding\ApplicationBindings $app
  */
 class Update20150902 extends Update
 {
@@ -106,7 +106,7 @@ class Update20150902 extends Update
  *
  * @module files
  *
- * @property \ICanBoogie\Core|Binding\CoreBindings $app
+ * @property \ICanBoogie\Core|Binding\ApplicationBindings $app
  */
 class Update20160709 extends Update
 {

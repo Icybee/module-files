@@ -11,6 +11,7 @@
 
 namespace Icybee\Modules\Files\Operation;
 
+use ICanBoogie\AppConfig;
 use ICanBoogie\ErrorCollection;
 use ICanBoogie\HTTP\Request;
 use ICanBoogie\HTTP\File as HTTPFile;
@@ -107,15 +108,16 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 		$request = $this->request;
 		$path = $request[File::HTTP_FILE];
 		$file = $request->files[self::USERFILE];
+		$config = $this->app->config;
 
 		if ($file && $file->is_valid)
 		{
 			$filename = \ICanBoogie\generate_v4_uuid();
-			$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . $filename;
+			$pathname = $config[AppConfig::REPOSITORY_TMP] . DIRECTORY_SEPARATOR . $filename;
 
 			$file->move($pathname);
 		}
-		else if ($path && strpos($path, \ICanBoogie\strip_root(\ICanBoogie\REPOSITORY . "files")) !== 0)
+		else if ($path && strpos($path, \ICanBoogie\strip_root($config[AppConfig::REPOSITORY_FILES])) !== 0)
 		{
 			$file = $this->resolve_request_file_from_pathname($path);
 
@@ -220,7 +222,7 @@ class SaveOperation extends \Icybee\Modules\Nodes\Operation\SaveOperation
 	protected function resolve_request_file_from_pathname($pathname)
 	{
 		$filename = basename($pathname);
-		$info_pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR . $filename . '.info';
+		$info_pathname = $this->app->config[AppConfig::REPOSITORY_TMP] . DIRECTORY_SEPARATOR . $filename . '.info';
 
 		if (!file_exists($info_pathname))
 		{
