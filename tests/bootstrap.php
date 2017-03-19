@@ -36,7 +36,7 @@ function get_sandbox_directory()
  */
 function create_file_record($src, array $attributes=[])
 {
-	$app = \ICanBoogie\app();
+	$app = app();
 
 	/* @var $user User */
 
@@ -93,7 +93,7 @@ $app = boot();
 $app->modules->install();
 
 // so we don't have to deal with the website
-Prototype::from(Core::class)['get_site_id'] = function() {
+Prototype::from(Application::class)['get_site_id'] = function() {
 
 	return 0;
 

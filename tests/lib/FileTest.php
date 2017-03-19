@@ -11,6 +11,7 @@
 
 namespace Icybee\Modules\Files;
 
+use function ICanBoogie\app;
 use function ICanBoogie\create_file;
 use ICanBoogie\HTTP\File as HTTPFile;
 
@@ -23,7 +24,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
 	static public function setUpBeforeClass()
 	{
-		self::$app = \ICanBoogie\app();
+		self::$app = app();
 	}
 
 	public function test_get_pathname()

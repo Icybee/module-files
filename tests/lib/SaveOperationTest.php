@@ -11,6 +11,7 @@
 
 namespace Icybee\Modules\Files;
 
+use function ICanBoogie\app;
 use function ICanBoogie\get_sandbox_directory;
 use ICanBoogie\HTTP\File as HTTPFile;
 use ICanBoogie\HTTP\Request;
@@ -24,7 +25,7 @@ use Icybee\Modules\Users\User;
 class SaveOperationTest extends \PHPUnit_Framework_TestCase
 {
 	/**
-	 * @var \ICanBoogie\Core|\Icybee\Binding\CoreBindings
+	 * @var \ICanBoogie\Application
 	 */
 	static private $app;
 
@@ -47,7 +48,7 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 	{
 		/* @var $user User */
 
-		self::$app = \ICanBoogie\app();
+		self::$app = app();
 
 		$user = self::$app->models['users'][1];
 		$user->login();
