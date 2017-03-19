@@ -94,7 +94,7 @@ class SaveOperationTest extends \PHPUnit_Framework_TestCase
 
 	public function provide_test_upload_error()
 	{
-		$size = ini_get('upload_max_filesize') * 1024 * 1024 * 3;
+		$size = (int) ini_get('upload_max_filesize') * 1024 * 1024 * 3;
 
 		return [
 

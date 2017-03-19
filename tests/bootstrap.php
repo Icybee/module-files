@@ -43,7 +43,7 @@ function create_file_record($src, array $attributes=[])
 	$user = $app->models['users'][1];
 	$user->login();
 
-	$pathname = \ICanBoogie\REPOSITORY . 'tmp' . DIRECTORY_SEPARATOR. basename($src);
+	$pathname = $app->config[AppConfig::REPOSITORY_TMP] . DIRECTORY_SEPARATOR . basename($src);
 
 	copy($src, $pathname);
 

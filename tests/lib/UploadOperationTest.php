@@ -90,7 +90,7 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 
 	public function provide_test_upload_error()
 	{
-		$size = ini_get('upload_max_filesize') * 1024 * 1024 * 3;
+		$size = (int) ini_get('upload_max_filesize') * 1024 * 1024 * 3;
 
 		return [
 
@@ -141,9 +141,13 @@ class UploadOperationTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals('application/x-php', $rc['type']);
 		$this->assertStringStartsWith('/repository/tmp/', $rc['pathname']);
 
-		$this->assertFileExists(\ICanBoogie\DOCUMENT_ROOT . $rc['pathname']);
-		$this->assertFileExists(\ICanBoogie\DOCUMENT_ROOT . $rc['pathname'] . '.info');
-		$this->assertJsonStringEqualsJsonString(json_encode($operation->file->to_array()), file_get_contents(\ICanBoogie\DOCUMENT_ROOT . $rc['pathname'] . '.info'));
+		$pathname = getcwd() . $rc['pathname'];
+		$this->assertFileExists($pathname);
+		$this->assertFileExists("$pathname.info");
+		$this->assertJsonStringEqualsJsonString(
+			json_encode($operation->file->to_array()),
+			file_get_contents("$pathname.info")
+		);
 	}
 
 	/**

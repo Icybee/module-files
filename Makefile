@@ -3,6 +3,7 @@
 PACKAGE_NAME = icybee/module-files
 PACKAGE_VERSION = 4.0
 COMPOSER_ENV = COMPOSER_ROOT_VERSION=$(PACKAGE_VERSION)
+PHPUNIT=vendor/bin/phpunit
 
 # do not edit the following lines
 
@@ -23,11 +24,11 @@ test: vendor
 	@rm -Rf tests/repository/files-index
 	@rm -Rf tests/repository/tmp
 	@rm  -f tests/sandbox/*-*
-	@phpunit
+	@$(PHPUNIT)
 
 test-coverage: vendor
 	@mkdir -p build/coverage
-	@phpunit --coverage-html ../build/coverage
+	@$(PHPUNIT) --coverage-html ../build/coverage
 
 doc: vendor
 	@mkdir -p build/docs
