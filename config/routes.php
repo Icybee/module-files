@@ -14,41 +14,46 @@ namespace Icybee\Modules\Files\Routing;
 use ICanBoogie\HTTP\Request;
 
 use Icybee\Routing\RouteMaker as Make;
+use ICanBoogie\Routing\RouteDefinition as Route;
 
 return [
 
 	'files:show' => [
 
-		'pattern' => '/files/<uuid:{:uuid:}><extension:[\.a-z]*>',
-		'controller' => FilesController::class . '#show',
-		'via' => Request::METHOD_GET
+		Route::PATTERN => '/files/<uuid:{:uuid:}><extension:[\.a-z]*>',
+		Route::CONTROLLER => FilesController::class,
+		Route::ACTION => Make::ACTION_SHOW,
+		Route::VIA => Request::METHOD_GET,
 
 	],
 
 	'files:download' => [
 
-		'pattern' => '/files/download/<uuid:{:uuid:}><extension:[\.a-z]*>',
-		'controller' => FilesController::class . '#download',
-		'via' => Request::METHOD_GET
+		Route::PATTERN => '/files/download/<uuid:{:uuid:}><extension:[\.a-z]*>',
+		Route::CONTROLLER => FilesController::class,
+		Route::ACTION => 'download',
+		Route::VIA => Request::METHOD_GET,
 
 	],
 
 	'files:protected:show' => [
 
-		'pattern' => '/files/<nid:\d+><extension:[\.a-z]*>',
-		'controller' => FilesAdminController::class . '#show'
+		Route::PATTERN => '/files/<nid:\d+><extension:[\.a-z]*>',
+		Route::CONTROLLER => FilesAdminController::class,
+		Route::ACTION => Make::ACTION_SHOW,
 
 	],
 
 	'files:protected:download' => [
 
-		'pattern' => '/files/download/<nid:\d+><extension:[\.a-z]*>',
-		'controller' => FilesAdminController::class . '#download'
+		Route::PATTERN => '/files/download/<nid:\d+><extension:[\.a-z]*>',
+		Route::CONTROLLER => FilesAdminController::class,
+		Route::ACTION => 'download',
 
 	]
 
 ] + Make::admin('files', FilesAdminController::class, [
 
-	'id_name' => 'nid'
+	Make::OPTION_ID_NAME => 'nid'
 
 ]);
