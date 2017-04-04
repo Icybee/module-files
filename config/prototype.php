@@ -17,7 +17,7 @@ $hooks = Hooks::class . '::';
 
 return [
 
-	ICanBoogie\Core::class . '::lazy_get_file_storage_index' => $hooks . 'get_file_storage_index',
-	ICanBoogie\Core::class . '::lazy_get_file_storage' => $hooks . 'get_file_storage'
+	ICanBoogie\Application::class . '::lazy_get_file_storage_index' => $hooks . 'get_file_storage_index',
+	ICanBoogie\Application::class . '::lazy_get_file_storage' => $hooks . 'get_file_storage'
 
 ];

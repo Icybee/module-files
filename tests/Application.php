@@ -13,7 +13,7 @@ namespace ICanBoogie;
 
 use Icybee\Modules;
 
-class Application extends Core
+class Application extends ApplicationAbstract
 {
 	use Modules\Files\Binding\ApplicationBindings;
 	use Modules\Users\Binding\ApplicationBindings;

@@ -46,8 +46,6 @@ class Update20120101 extends Update
  * - Add column `extension`.
  *
  * @module files
- *
- * @property \ICanBoogie\Core|Binding\ApplicationBindings $app
  */
 class Update20150902 extends Update
 {
@@ -105,8 +103,6 @@ class Update20150902 extends Update
  * - Add column `short_hash`.
  *
  * @module files
- *
- * @property \ICanBoogie\Core|Binding\ApplicationBindings $app
  */
 class Update20160709 extends Update
 {
