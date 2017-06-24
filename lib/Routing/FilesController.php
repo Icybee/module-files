@@ -15,7 +15,7 @@ use ICanBoogie\HTTP\FileResponse;
 use ICanBoogie\Routing\Controller;
 use ICanBoogie\Binding\Routing\ControllerBindings;
 use ICanBoogie\Binding\Routing\ForwardUndefinedPropertiesToApplication;
-use ICanBoogie\Module\ControllerBindings as ModuleBindings;
+use ICanBoogie\Binding\Module\ControllerBindings as ModuleBindings;
 
 use Icybee\Modules\Files\Binding\ApplicationBindings;
 use Icybee\Modules\Files\File;
