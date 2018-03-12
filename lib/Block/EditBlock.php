@@ -22,6 +22,9 @@ use Brickrouge\Form;
 use Icybee\Modules\Files as Root;
 use Icybee\Modules\Files\File;
 
+use function Brickrouge\get_accessible_file;
+use function ICanBoogie\strip_root;
+
 /**
  * @property File $record
  */
@@ -71,13 +74,13 @@ class EditBlock extends \Icybee\Modules\Nodes\Block\EditBlock
 
 		$properties = $this->values;
 		$nid = $properties[File::NID];
-		$path = \ICanBoogie\strip_root($properties[File::HTTP_FILE]);
+		$path = $properties[File::HTTP_FILE];
 
 		if (!$path && $this->record)
 		{
 			try
 			{
-				$path = $this->record->pathname->relative;
+				$path = $this->record->pathname;
 			}
 			catch (\Exception $e)
 			{
@@ -113,6 +116,7 @@ class EditBlock extends \Icybee\Modules\Nodes\Block\EditBlock
 		];
 
 		$uploader_class = $options[self::UPLOADER_CLASS];
+		$public_path = $path ? $this->resolve_public_path($path) : null;
 
 		return array_merge(parent::lazy_get_children(), [
 
@@ -124,7 +128,7 @@ class EditBlock extends \Icybee\Modules\Nodes\Block\EditBlock
 				Element::WEIGHT => -100,
 				\Brickrouge\File::T_UPLOAD_URL => Operation::encode($this->module->id . '/upload'),
 
-				'value' => $path
+				'value' => $public_path
 
 			]),
 
@@ -137,5 +141,10 @@ class EditBlock extends \Icybee\Modules\Nodes\Block\EditBlock
 
 			])
 		]);
+	}
+
+	public function resolve_public_path($absolute_path)
+	{
+		return strip_root(get_accessible_file($absolute_path));
 	}
 }
